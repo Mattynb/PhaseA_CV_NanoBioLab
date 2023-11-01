@@ -1,4 +1,4 @@
-from finders.rgb_finder import RGB_Finder
+#from finders.rgb_finder import RGB_Finder
 from obj.blocks import Block
 from obj.pins import Pin
 
@@ -10,7 +10,7 @@ class PinFinder:
 
         # start from top right of the grid.
         # go through each spot in the grid and check which pins are within that x,y,w,h.
-            # if there are 4 pins that are aligned (or very close to being aligned), there is your pins
+            # if there are 4 circles that are aligned (or very close to being aligned), there are your pins
         pins = []
 
 
@@ -18,7 +18,7 @@ class PinFinder:
         #   ___________     
         #  |           | 
         #  |  a     b  |
-        #  |           |
+        #  |     .     |
         #  |  c     d  |
         #  |___________|
         # 

@@ -1,11 +1,16 @@
 
 # A singular pin
 class Pin:
-    def __init__(self, coords ):
-        self.rgb = ...
-        self.coords = coords # (x, y, r)
+    def __init__(self, coords, img):
+        self.coords = coords
+        self.x,self.y,self.w,self.h = coords
+        
+        self.img = img[self.x : self.x+self.w, self.y: self.y+self.h] # img of only the result
+        self.rgb = self.get_rgb_avg()
 
-    def get_rgb_avg(img, coords_sq):
+    def get_rgb_avg(self):
+        img = self.img
+        coords_sq = self.coords
         x, y, h, w = coords_sq
         n = h*w # n of pixels
         R_avg = []
