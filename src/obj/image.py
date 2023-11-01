@@ -6,6 +6,7 @@ class Image:
         self.id = id
         
         self.img_og = image
+        self.img_std_size = self.resize_2_std()
         #self.img_std = self.pre_process()  # std == processed
         
         #self.ref_squares = self.find_ref_squares()  # [coords1, cords2, ... , coords4]
@@ -15,7 +16,7 @@ class Image:
 
 
     def pre_process(self):
-        img = self.img_ogS 
+        img = self.img_og 
         
         img = self.angle_fix(img)
         img = self.isolate_foreground(img) # now you only have the grid 
@@ -78,8 +79,13 @@ class Image:
     def isolate_foreground(self):
         ...
 
-    def resize_2_std(self):
-        ...
+    def resize_2_std(self, i = 0):
+        from cv2 import resize
+
+        if i == 0:
+            img = self.img_og
+
+        self.img_std_size = resize(img, (500,500))
 
 def Image_loader(path_to_images: str) -> list[Image]:
     """Loads all the images in a path as Image"""
@@ -93,13 +99,22 @@ def Image_loader(path_to_images: str) -> list[Image]:
     for f_type in types:      
         imgs.extend([imread(file) for file in glob(f"{path_to_images}\{f_type}")])
     
-    # turning read images into Image type
+    # turning read images into Image
     Images = [Image( i + 100, imgs[i]) for i in range(len(imgs))]
     
     return Images 
 
 
 if __name__ == '__main__':
+
     # Image_loader test
+    from cv2 import imshow, waitKey, destroyAllWindows
+    Images = Image_loader(r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img") 
+    for i in Images:
+        i.resize_2_std()
+        imshow(str(i.id), i.img_std_size)
+    waitKey(0)
+    destroyAllWindows()
+
 
 
