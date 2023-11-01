@@ -5,7 +5,6 @@ class Pin:
         self.rgb = ...
         self.coords = coords # (x, y, r)
 
-
     def get_rgb_avg(img, coords_sq):
         x, y, h, w = coords_sq
         n = h*w # n of pixels
