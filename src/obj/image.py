@@ -93,11 +93,18 @@ def Image_loader(path_to_images: str) -> list[Image]:
     from glob import glob
     from cv2 import imread
 
+    
+    types = ('.png', '.jpg', '.jpeg')
+
+    # reading single image if path is only one image
+    end = path_to_images[-4:]
+    if end in types or end == 'jpeg': 
+        return [Image(100, imread(path_to_images))]
+
     # reading all images of acceptable types from given directory 
-    types = ('*.png', '*.jpeg', '*.jpg')
     imgs = []
     for f_type in types:      
-        imgs.extend([imread(file) for file in glob(f"{path_to_images}\{f_type}")])
+        imgs.extend([imread(file) for file in glob(f"{path_to_images}\*{f_type}")])
     
     # turning read images into Image
     Images = [Image( i + 100, imgs[i]) for i in range(len(imgs))]
@@ -106,10 +113,9 @@ def Image_loader(path_to_images: str) -> list[Image]:
 
 
 if __name__ == '__main__':
-
     # Image_loader test
     from cv2 import imshow, waitKey, destroyAllWindows
-    Images = Image_loader(r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img") 
+    Images = Image_loader(r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img\block3.jpeg") 
     for i in Images:
         i.resize_2_std()
         imshow(str(i.id), i.img_std_size)
