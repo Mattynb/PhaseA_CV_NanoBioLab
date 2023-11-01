@@ -1,9 +1,4 @@
-def Image_loader(path_to_images):
-    images = []
-    
-    ...
 
-    return images
 
 
 class Image:
@@ -11,16 +6,16 @@ class Image:
         self.id = id
         
         self.img_og = image
-        self.img_std = self.pre_process()  # std == processed
+        #self.img_std = self.pre_process()  # std == processed
         
-        self.ref_squares = self.find_ref_squares()  # [coords1, cords2, ... , coords4]
-        self.grid = None
-        self.edges = []
-        self.blocks = []
+        #self.ref_squares = self.find_ref_squares()  # [coords1, cords2, ... , coords4]
+        #self.grid = None
+        #self.edges = []
+        #self.blocks = []
 
 
     def pre_process(self):
-        img = self.og_img 
+        img = self.img_ogS 
         
         img = self.angle_fix(img)
         img = self.isolate_foreground(img) # now you only have the grid 
@@ -31,26 +26,44 @@ class Image:
 
 
     def angle_fix(self):
-        for ref_sq in self.ref_squares:
-            tl,tr,br,bl = ...
-        
+        """ 
+        Not Finished yet.\n
+        Be aware that the copied part of the algorithm assumes that tl, tr, br, bl 
+        refer to the whole grid rather than individual squares
         """
-        (tl, tr, br, bl) = pts
+        from numpy import sqrt, float32
+        from cv2 import getPerspectiveTransform, warpPerspective, INTER_LINEAR
+
+        for i in range (4):
+            ref_sq = self.ref_squares[i]
+            x,y,w,h = ref_sq
+            tl = (x,y) 
+            tr = (x+w, y) 
+            br = (x, y+h)
+            bl = (x+w, y+h)
+        
+        
         # Finding the maximum width.
-        widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-        widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+        widthA = sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+        widthB = sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
         maxWidth = max(int(widthA), int(widthB))
+
         # Finding the maximum height.
-        heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-        heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+        heightA = sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+        heightB = sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
         maxHeight = max(int(heightA), int(heightB))
+
         # Final destination co-ordinates.
         destination_corners = [[0, 0], [maxWidth, 0], [maxWidth, maxHeight], [0, maxHeight]]
-        """
+
+        # Getting the homography.
+        #M = getPerspectiveTransform(float32(corners), float32(destination_corners))
+
+        # Perspective transform using homography.
+        #final = warpPerspective(self.img_og, M, (destination_corners[2][0], destination_corners[2][1]), flags=INTER_LINEAR)
 
         
 
-        ...
 
     def find_ref_squares(self):
         ref_squares = []
@@ -67,9 +80,26 @@ class Image:
 
     def resize_2_std(self):
         ...
-    
-    def load(self, path_to_images):
 
-        return
+def Image_loader(path_to_images: str) -> list[Image]:
+    """Loads all the images in a path as Image"""
+
+    from glob import glob
+    from cv2 import imread
+
+    # reading all images of acceptable types from given directory 
+    types = ('*.png', '*.jpeg', '*.jpg')
+    imgs = []
+    for f_type in types:      
+        imgs.extend([imread(file) for file in glob(f"{path_to_images}\{f_type}")])
+    
+    # turning read images into Image type
+    Images = [Image( i + 100, imgs[i]) for i in range(len(imgs))]
+    
+    return Images 
+
+
+if __name__ == '__main__':
+    # Image_loader test
 
 
