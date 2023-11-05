@@ -1,12 +1,11 @@
-
-
+import cv2 as cv
 
 class Image:
     def __init__(self, id, image):
         self.id = id
         
         self.img_og = image
-        self.img_std_size = self.resize_2_std()
+        self.img_std_size = self.resize_2_std(image)
         #self.img_std = self.pre_process()  # std == processed
         
         #self.ref_squares = self.find_ref_squares()  # [coords1, cords2, ... , coords4]
@@ -33,7 +32,6 @@ class Image:
         refer to the whole grid rather than individual squares
         """
         from numpy import sqrt, float32
-        from cv2 import getPerspectiveTransform, warpPerspective, INTER_LINEAR
 
         for i in range (4):
             ref_sq = self.ref_squares[i]
@@ -68,24 +66,38 @@ class Image:
 
     def find_ref_squares(self):
         ref_squares = []
-        
-        # use adaptive filtering to leave only the black squares, there should be exactly four
+        src_img = self.img_std_size
+
+        print(f"type(img):{type(src_img)}")
+
+        # use threshold to leave only the black squares, there should be exactly four
+        img = cv.cvtColor(src_img, cv.COLOR_RGB2GRAY)
+        img = cv.GaussianBlur(img, (5,5), 9)
+        _, img = cv.threshold(img, 50, 255, cv.THRESH_BINARY)
+        edges = cv.Canny(img, 150, 150)
+
+        contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+        img = self.img_std_size
+        for contour in contours:
+            x, y, w, h = cv.boundingRect(contour)
+            cv.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
+
+        cv.imshow('img', img)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
     
         # record the coordinates of each square edge
         # now you can calculate the lenght and area in pixels of each square
-        ...
+    
         return ref_squares # [coords1, cords2, ... , coords4], coords = (x, y, L)
 
     def isolate_foreground(self):
         ...
 
-    def resize_2_std(self, i = 0):
-        from cv2 import resize
-
-        if i == 0:
-            img = self.img_og
-
-        self.img_std_size = resize(img, (500,500))
+    def resize_2_std(self, img):
+        return cv.resize(img, (500,500))
 
 def Image_loader(path_to_images: str) -> list[Image]:
     """Loads all the images in a path as Image"""
@@ -113,14 +125,14 @@ def Image_loader(path_to_images: str) -> list[Image]:
 
 
 if __name__ == '__main__':
-    # Image_loader test
-    from cv2 import imshow, waitKey, destroyAllWindows
-    Images = Image_loader(r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img\block3.jpeg") 
-    for i in Images:
-        i.resize_2_std()
-        imshow(str(i.id), i.img_std_size)
-    waitKey(0)
-    destroyAllWindows()
+    
+    image = Image_loader(r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img\block_with_refSq.jpeg") 
+    
+    I = image[0]
+    I.find_ref_squares()
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 

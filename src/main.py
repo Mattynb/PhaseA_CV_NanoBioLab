@@ -1,4 +1,4 @@
-from obj.image import Image_loader
+from obj.image import Image_loader, Image
 
 from finders.edge_finder import EdgeFinder
 from finders.circle_finder import CircleFinder
@@ -24,6 +24,7 @@ class PhaseA:
             img.blocks = PinFinder(img)
             for block in img.blocks:
                 block.encoding_finder()
+          
 
 
 
