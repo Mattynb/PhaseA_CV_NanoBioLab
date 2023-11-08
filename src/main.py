@@ -1,36 +1,29 @@
-from obj.image import Image_loader, Image
-
-from finders.edge_finder import EdgeFinder
-from finders.circle_finder import CircleFinder
-from finders.pin_finder import PinFinder
+from Image.image_class import Image
+from Image.image_loader import Image_load
 
 
-class PhaseA:
-    def __init__(self, img_dir, ):
-        self.images = Image_loader(img_dir)
-
-        self.main()
-
-    def main(self):
-        # pre_process images: angle_fix -> isolate_foreground -> resize_2_std
-        for img in self.images:
-            img.pre_process(0)
-
-            
-        # start finding 
-        for img in self.images:
-            img.edges = EdgeFinder(img)
-            img.circles = CircleFinder(img)
-            img.blocks = PinFinder(img)
-            for block in img.blocks:
-                block.encoding_finder()
-          
+def main(path_to_imgs):
+    """
+    ### Main function
+    Loads all the images in a folder and creates an Image object for each image
 
 
+    #### Args:
+    path_to_imgs: path to image folder
+    """
 
-        
+    images_og = Image_load(path_to_imgs)
 
+    id = 0
+    Images = []
+    for img in images_og:
+        Images.append(Image(id, img))
+        id += 1
+    
 
+if __name__ == '__main__':
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\*"
+    main(path_to_imgs)
 
 
 
