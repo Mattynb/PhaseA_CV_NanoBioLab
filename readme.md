@@ -50,22 +50,21 @@ The Image_scanner.py module offers functionality for scanning and processing ima
 
 For more details, refer to the individual code files and their respective functions.
 
-Contributing
+### Contributing
 If you'd like to contribute to this project, please follow these guidelines:
 
-Fork the repository.
-Create a new branch for your feature or bug fix.
-Make your changes.
-Test your changes thoroughly.
-Create a pull request.
-License
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes.
+4. Test your changes thoroughly.
+5.Create a pull request.
+
+### License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-Contact
-If you have any questions or need assistance, feel free to contact the project maintainers:
+### Contact
+If you have any questions or need assistance, feel free to contact me:
 
-Your Name your.email@example.com
-We hope you find this toolkit useful for your image processing needs!
+Matheus Berbet - matheus.berbet001@umb.edu
 
-less
-Copy co
+We hope you find this repository useful for your image processing needs!
