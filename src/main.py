@@ -1,6 +1,8 @@
 from Image.image_class import Image
 from Image.image_loader import Image_load
 
+from Image.image_preprocess import pre_process
+
 
 def main(path_to_imgs):
     """
@@ -12,8 +14,10 @@ def main(path_to_imgs):
     path_to_imgs: path to image folder
     """
 
+    # loading images
     images_og = Image_load(path_to_imgs)
 
+    # creating Image objects
     id = 0
     Images = []
     for img in images_og:
@@ -22,6 +26,11 @@ def main(path_to_imgs):
             id += 1
         except AttributeError:
             print("\nImage not loaded, check path\n")
+
+    # finding pins
+    for img in Images:
+        pre_process(img.img_scan)
+
 
 if __name__ == '__main__':
     path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\IMG_4993.png"
