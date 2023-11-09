@@ -17,12 +17,14 @@ def main(path_to_imgs):
     id = 0
     Images = []
     for img in images_og:
-        Images.append(Image(id, img))
-        id += 1
-    
+        try:
+            Images.append(Image(id, img))
+            id += 1
+        except AttributeError:
+            print("\nImage not loaded, check path\n")
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\*"
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\IMG_4993.png"
     main(path_to_imgs)
 
 
