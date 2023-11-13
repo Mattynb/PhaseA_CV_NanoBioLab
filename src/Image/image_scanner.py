@@ -18,7 +18,7 @@ def Image_scan(std_size_img):
         
         # copy of the image to be scanned (to not mess with the original)
         img = std_size_img.copy()
-        """
+        #"""
         cv.imshow('og', img)
         cv.waitKey(0)  
         cv.destroyAllWindows()

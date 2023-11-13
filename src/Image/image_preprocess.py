@@ -47,27 +47,22 @@ def pre_process(scaned_image):
     img_hsv = cv2.cvtColor(scaned_image_copy, cv2.COLOR_BGR2HSV)
 
     # Define the lower and upper bounds for the color you want to isolate
-    lower_color = np.array([28, 28, 28])
+    lower_color = np.array([30, 28, 30])
     upper_color = np.array([215, 215, 215])
 
     # Create a mask using the inRange function
-    color_mask = cv2.inRange(scaned_image_copy, lower_color, upper_color)
+    color_mask = cv2.inRange(img_hsv, lower_color, upper_color)
     
     cv.imshow('img_hsv', img_hsv)
+    cv.imshow('mask', color_mask)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-    # Apply morphological operations (dilation followed by erosion) to remove shadows
-    kernel = np.ones((5,5),np.uint8)
-    color_mask = cv.morphologyEx(color_mask, cv.MORPH_CLOSE, kernel)
+   
 
     # Apply the mask to the original image using bitwise_and
-    result = cv2.bitwise_and(scaned_image_copy, scaned_image_copy, mask=color_mask)
+    result = cv2.bitwise_and(scaned_image_copy, img_hsv, mask=color_mask)
     
-    cv.imshow('kernel mask', color_mask)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-
     edges = cv.Canny(result, 100, 200)
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
     
@@ -75,14 +70,17 @@ def pre_process(scaned_image):
     xx = scaned_image.shape[0]
     yy = scaned_image.shape[1] 
     pin_ratio = round(scaned_image.shape[1] * 0.01)
-    edge_ratio = round(scaned_image.shape[1] * 0.005) # double check this value
-    plus_minus = round(scaned_image.shape[1] * 0.015)
-    #cv.rectangle(scaned_image, (edge_ratio, edge_ratio), (xx + edge_ratio, yy - edge_ratio), (0, 0, 255), 1)
+    edge_ratio = round(scaned_image.shape[1] * 0.01)
+    plus_minus = round(scaned_image.shape[1] * 0.008)
+
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if (x, y) > (edge_ratio, edge_ratio) and (x, y) < (xx + edge_ratio, yy - edge_ratio):
-            if  (h,w) <= (pin_ratio + plus_minus, pin_ratio + plus_minus):        
-                cv.rectangle(scaned_image, (x, y), (x+w, y+h), (0, 255, 0), 1)
+
+        # checks if the contour is inside edges of the grid and if its around the size of a pin.
+        if x > edge_ratio and y > edge_ratio: 
+            if x+w < xx - edge_ratio and y+h < yy - edge_ratio:
+                if  h <= pin_ratio + plus_minus and w <= pin_ratio + plus_minus:   
+                    cv.rectangle(scaned_image, (x, y), (x+w, y+h), (0, 255, 0), 1)
 
     cv.imshow('contour', scaned_image)
     cv.imshow('result', result)
