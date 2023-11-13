@@ -2,6 +2,7 @@ import cv2 as cv
 from cv2.typing import MatLike
 from random import randint
 from Image.image_scanner import Image_scan
+
 #from Image.image_preprocess import pre_process
 
 class Image:
@@ -31,6 +32,7 @@ class Image:
         self.img_og = image_og
         self.img_resized = self.resize_2_std(image_og, resize_factor)
         self.img_scan = Image_scan(self.img_resized)
+        
         #self.img_std = pre_process(self.img_scan)
 
 

@@ -99,11 +99,12 @@ def Image_scan(std_size_img):
         M = cv.getPerspectiveTransform(np.float32(corners), np.float32(destination_corners))
         # Perspective transform using homography.
         final = cv.warpPerspective(std_size_img, M, (destination_corners[2][0], destination_corners[2][1]), flags=cv.INTER_LINEAR)
-        #"""
+        """
         cv.imshow('final', final)
         cv.waitKey(0)
         cv.destroyAllWindows()
         #"""
+       
         return final
 
 def find_dest(pts):

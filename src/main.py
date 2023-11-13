@@ -23,6 +23,7 @@ def main(path_to_imgs):
     for img in images_og:
         try:
             Images.append(Image(id, img))
+            print(f"Image {id} loaded")
             id += 1
         except AttributeError:
             print("\nImage not loaded, check path\n")
@@ -33,10 +34,8 @@ def main(path_to_imgs):
 
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\IMG_4993.png"
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\IMG_4975.png" #IMG_4975.png
     main(path_to_imgs)
-
-
 
 
 
