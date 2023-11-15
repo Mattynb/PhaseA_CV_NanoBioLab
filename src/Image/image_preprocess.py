@@ -33,10 +33,22 @@ def pre_process(scaned_image):
     # Apply the mask to the original image using bitwise_and
     result = cv.bitwise_and(scaned_image_copy, scaned_image_copy, mask=color_mask)
     
-    draw_recognized(result, scaned_image_copy)
+    return draw_recognized(result, scaned_image_copy)
 
+def draw_recognized(result, scaned_image) -> list:
+    """
+    ### Draw recognized
+    ---------------
+    Function that draws a rectangle around the recognized pins.
+    
+    #### Args:
+    result: image where contours are found
+    scaned_image: image where the rectangles are drawn
+    
+    #### Returns:
+    List of contours
+    """
 
-def draw_recognized(result, scaned_image):
     edges = cv.Canny(result, 100, 200)
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
     
@@ -58,6 +70,8 @@ def draw_recognized(result, scaned_image):
                         cv.rectangle(scaned_image, (x, y), (x+w, y+h), (0, 255, 0), 1)
 
     cv.imshow('contour', scaned_image)
+
+    return contours
 
 def adaptive_pre_process(scaned_image):
     """
@@ -118,3 +132,29 @@ def adaptive_pre_process(scaned_image):
    
     cv.destroyAllWindows()
 
+def grid(scaned_image):
+    """
+    ### Grid
+    ---------------
+    Function that draws a grid on the image.
+    """
+    scaned_image_copy = scaned_image.copy()
+
+    xx = scaned_image.shape[0]
+    yy = scaned_image.shape[1] 
+    pin_ratio = round(scaned_image.shape[1] * 0.01)
+    edge_ratio = round(scaned_image.shape[1] * 0.012)
+    block_ratio = round(scaned_image.shape[1] * 0.076)
+    plus_minus = round(scaned_image.shape[1] * 0.002)
+
+    j = 0
+    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio):
+        if j % 2 != 0:
+            i = i + edge_ratio
+
+        cv.line(scaned_image_copy, (0, i), (yy, i), (0, 255, 0), 1)
+        cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
+        
+    cv.imshow('grid', scaned_image_copy)
+    cv.waitKey(0)
+    cv.destroyAllWindows()

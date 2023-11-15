@@ -1,7 +1,7 @@
 from Image.image_class import Image
 from Image.image_loader import Image_load
 
-from Image.image_preprocess import pre_process, adaptive_pre_process
+from Image.image_preprocess import pre_process, adaptive_pre_process, grid
 
 
 def main(path_to_imgs):
@@ -29,7 +29,7 @@ def main(path_to_imgs):
 
     # finding pins
     for img in Images:
-        adaptive_pre_process(img.img_scan)
+        grid(img.img_scan)
 
 if __name__ == '__main__':
     path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5011.JPEG" #data\grid_on_black_img\std_angle\
