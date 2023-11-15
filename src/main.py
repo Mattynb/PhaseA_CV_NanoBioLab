@@ -7,8 +7,7 @@ from Image.image_preprocess import pre_process, adaptive_pre_process
 def main(path_to_imgs):
     """
     ### Main function
-    Loads all the images in a folder and creates an Image object for each image
-
+    Loads all the images in a folder and creates an Image object for each image.
 
     #### Args:
     path_to_imgs: path to image folder

@@ -31,13 +31,15 @@ class Image:
         
         self.img_og = image_og
         self.img_resized = self.resize_2_std(image_og, resize_factor)
-        self.img_scan = Image_scan(self.img_resized)
+
+        w, h = self.img_resized.shape[:2]
+        self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
         
         #self.img_std = pre_process(self.img_scan)
 
 
        
-    def resize_2_std(self, img, factor=0.25):
+    def resize_2_std(self, img, factor=0.25, w= None, h = None):
         """
         ### Resize image
         Resizes image to a standard size
@@ -48,8 +50,9 @@ class Image:
         #### Returns:
         Resized image
         """
-
-        h, w = img.shape[:2]
+        if w == None and h == None:
+            w, h = img.shape[:2]
+        
         return cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_LINEAR)
 
 

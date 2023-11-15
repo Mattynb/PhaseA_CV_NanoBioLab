@@ -57,7 +57,7 @@ def draw_recognized(result, scaned_image):
                     if h > pin_ratio - plus_minus and w > pin_ratio - plus_minus: 
                         cv.rectangle(scaned_image, (x, y), (x+w, y+h), (0, 255, 0), 1)
 
-    #cv.imshow('contour', scaned_image)
+    cv.imshow('contour', scaned_image)
 
 def adaptive_pre_process(scaned_image):
     """
@@ -85,10 +85,8 @@ def adaptive_pre_process(scaned_image):
 
         # Apply the mask to the original image using bitwise_and
         result = cv.bitwise_and(scaned_image_copy, scaned_image_copy, mask=color_mask)
-
-        cv.imshow('result', scaned_image_copy)
+        
         cv.imshow('mask', color_mask)
-
         key = cv.waitKey(1) & 0xFF
 
         # Press 'q' to break the loop
@@ -113,13 +111,10 @@ def adaptive_pre_process(scaned_image):
             print(lower_color)
             
             buffer = lower_color.copy()
-            cv.destroyWindow('result')
-            cv.destroyWindow('mask')
+            cv.destroyAllWindows()
             
             drawed = scaned_image_copy.copy()  
             draw_recognized(result, drawed)
-            cv.imshow('result', drawed)
-            cv.imshow('mask', color_mask)
    
     cv.destroyAllWindows()
 
