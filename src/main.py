@@ -1,7 +1,7 @@
 from Image.image_class import Image
 from Image.image_loader import Image_load
 
-from Image.image_preprocess import pre_process
+from Image.image_preprocess import pre_process, adaptive_pre_process
 
 
 def main(path_to_imgs):
@@ -22,7 +22,7 @@ def main(path_to_imgs):
     Images = []
     for img in images_og:
         try:
-            Images.append(Image(id, img))
+            Images.append(Image(id, img, 0.4))
             print(f"Image {id} loaded")
             id += 1
         except AttributeError:
@@ -30,12 +30,13 @@ def main(path_to_imgs):
 
     # finding pins
     for img in Images:
-        pre_process(img.img_scan)
-
+        adaptive_pre_process(img.img_scan)
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\IMG_4992.png" #IMG_4975.png
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5011.JPEG" #data\grid_on_black_img\std_angle\
     main(path_to_imgs)
+
+
 
 
 

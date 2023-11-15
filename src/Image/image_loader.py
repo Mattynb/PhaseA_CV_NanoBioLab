@@ -16,12 +16,12 @@ def Image_load(path_to_images):
     List of images
     """
 
-    types = ('.png', '.jpg', '.jpeg')
+    types = ('.png', '.jpg', '.jpeg', '.JPEG', '.PNG', '.JPG')
 
     # reading single image if path is only one image
     end = path_to_images[-4:]
     
-    if end in types or end == 'jpeg': 
+    if end in types or end.lower() == 'jpeg': 
         return [cv.imread(path_to_images)]
 
     # reading all images of acceptable types from given directory 
