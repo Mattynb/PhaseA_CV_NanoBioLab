@@ -144,17 +144,25 @@ def grid(scaned_image):
     yy = scaned_image.shape[1] 
     pin_ratio = round(scaned_image.shape[1] * 0.01)
     edge_ratio = round(scaned_image.shape[1] * 0.012)
-    block_ratio = round(scaned_image.shape[1] * 0.076)
+    block_ratio = round(scaned_image.shape[1] * 0.0868)
     plus_minus = round(scaned_image.shape[1] * 0.002)
 
-    j = 0
-    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio):
-        if j % 2 != 0:
-            i = i + edge_ratio
+    
+    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio + edge_ratio):
+
+        """
+        maybe do the preprocessing here, as in look for the pins in each block rather than the entire grid?
+        or maybe look for 
+        
+        """
+
+        cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
+        cv.line(scaned_image_copy, (i + block_ratio, 0), (i + block_ratio, xx), (0, 255, 0), 1)
 
         cv.line(scaned_image_copy, (0, i), (yy, i), (0, 255, 0), 1)
-        cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
-        
-    cv.imshow('grid', scaned_image_copy)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+        cv.line(scaned_image_copy, (0, i + block_ratio), (yy, i + block_ratio), (0, 255, 0), 1)
+
+
+        cv.imshow('grid', scaned_image_copy)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
