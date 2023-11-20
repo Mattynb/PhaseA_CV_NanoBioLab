@@ -32,7 +32,7 @@ def main(path_to_imgs):
         grid(img.img_scan)
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5011.JPEG" #data\grid_on_black_img\std_angle\
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.JPEG" #IMG_5020.JPEG
     main(path_to_imgs)
 
 

@@ -22,7 +22,7 @@ def pre_process(scaned_image):
     color_mask = cv.medianBlur(color_mask, 5)
 
     
-    """
+    #"""
     cv.imshow('img_hsv', img_hsv)
     cv.imshow('mask', color_mask)
     cv.waitKey(0)
@@ -33,7 +33,9 @@ def pre_process(scaned_image):
     # Apply the mask to the original image using bitwise_and
     result = cv.bitwise_and(scaned_image_copy, scaned_image_copy, mask=color_mask)
     
-    return draw_recognized(result, scaned_image_copy)
+    draw_recognized(result, scaned_image_copy)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 def draw_recognized(result, scaned_image) -> list:
     """
@@ -57,7 +59,7 @@ def draw_recognized(result, scaned_image) -> list:
     yy = scaned_image.shape[1] 
     pin_ratio = round(scaned_image.shape[1] * 0.01)
     edge_ratio = round(scaned_image.shape[1] * 0.01)
-    plus_minus = round(scaned_image.shape[1] * 0.005)
+    plus_minus = pin_ratio#round(scaned_image.shape[1] * 0.005)
 
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
@@ -67,9 +69,10 @@ def draw_recognized(result, scaned_image) -> list:
             if x+w < xx - edge_ratio and y+h < yy - edge_ratio:
                 if  h <= pin_ratio + plus_minus and w <= pin_ratio + plus_minus: 
                     if h > pin_ratio - plus_minus and w > pin_ratio - plus_minus: 
-                        cv.rectangle(scaned_image, (x, y), (x+w, y+h), (0, 255, 0), 1)
+                        cv.rectangle(scaned_image, (x, y), (x+pin_ratio, y+pin_ratio), (0, 255, 0), 1)
 
     cv.imshow('contour', scaned_image)
+   
 
     return contours
 
@@ -144,25 +147,76 @@ def grid(scaned_image):
     yy = scaned_image.shape[1] 
     pin_ratio = round(scaned_image.shape[1] * 0.01)
     edge_ratio = round(scaned_image.shape[1] * 0.012)
-    block_ratio = round(scaned_image.shape[1] * 0.0868)
+    block_ratio = round(scaned_image.shape[1] * 0.088)
     plus_minus = round(scaned_image.shape[1] * 0.002)
 
-    
-    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio + edge_ratio):
+    # grid_ds:[ block_width, [[{top left:(x,y), bottom right:(xx, yy), width: x-xx, is_block: True}], ... ]]
+    grid_ds = [block_ratio, [] ]
+    square = {"tl": 0, "br": 0, "block": False}
 
-        """
-        maybe do the preprocessing here, as in look for the pins in each block rather than the entire grid?
-        or maybe look for 
+    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio + edge_ratio):
+        for j in range(0 + edge_ratio, yy - edge_ratio,  block_ratio + edge_ratio):
+            sq = square.copy()
+            sq["tl"] = (i - edge_ratio, j - edge_ratio)
+            sq["br"] = (i + block_ratio + edge_ratio, j + block_ratio + edge_ratio)
+     
+            if    j%2 == 0 and i%2 == 0: color = (0, 0, 255)
+            elif  j%2 == 0 and i%2 == 1: color = (0, 255, 0)
+            elif  j%2 == 1 and i%2 == 0: color = (255, 255, 0)
+            else: color = (255, 0, 0)
+
+            cv.rectangle(scaned_image_copy, sq["tl"], sq["br"], color, 1)
+
+            x_index, y_index = xy_to_index(i, j, grid_ds)
+            try:
+                grid_ds[1][x_index].append(sq)
+            except IndexError:
+                grid_ds[1].append([sq])
+
+            """
+            cv.imshow('grid', scaned_image_copy)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+            grid_ds.append(sq)
+            #"""
         
         """
-
         cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
         cv.line(scaned_image_copy, (i + block_ratio, 0), (i + block_ratio, xx), (0, 255, 0), 1)
 
         cv.line(scaned_image_copy, (0, i), (yy, i), (0, 255, 0), 1)
         cv.line(scaned_image_copy, (0, i + block_ratio), (yy, i + block_ratio), (0, 255, 0), 1)
+        """
+
+    #"""
+    cv.imshow('grid', scaned_image_copy)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+    grid_ds.append(sq)
+    #"""
+
+    print(f"{len(grid_ds[1])} x {len(grid_ds[1][0])} ")
 
 
-        cv.imshow('grid', scaned_image_copy)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+
+# create a function that translates the x,y coordinates of a pin to the equivalent index of grid_ds.
+def xy_to_index(x, y, grid_ds):
+    """
+    ### XY to index
+    ---------------
+    Function that translates the x,y coordinates of a pin to the equivalent index of grid_ds.
+    
+    #### Args:
+    x: x coordinate of the pin
+    y: y coordinate of the pin
+    grid_ds: grid_ds:[ block_width, [[ square{tl, br, block} , ...], ...] ]
+
+    #### Returns:
+    Index of the pin in grid_ds
+    """
+    
+    x_index = int(round(x / grid_ds[0], 1))
+    y_index = int(round(y / grid_ds[0], 1))
+
+    return (x_index, y_index)
+   
