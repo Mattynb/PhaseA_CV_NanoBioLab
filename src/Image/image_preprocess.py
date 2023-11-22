@@ -1,3 +1,4 @@
+from tkinter import X
 import cv2 as cv
 import numpy as np
 
@@ -146,19 +147,19 @@ def grid(scaned_image):
     xx = scaned_image.shape[0]
     yy = scaned_image.shape[1] 
     pin_ratio = round(scaned_image.shape[1] * 0.01)
-    edge_ratio = round(scaned_image.shape[1] * 0.012)
+    edge_ratio = round(scaned_image.shape[1] * 0.0109)
     block_ratio = round(scaned_image.shape[1] * 0.088)
     plus_minus = round(scaned_image.shape[1] * 0.002)
 
-    # grid_ds:[ block_width, [[{top left:(x,y), bottom right:(xx, yy), width: x-xx, is_block: True}], ... ]]
-    grid_ds = [block_ratio, [] ]
-    square = {"tl": 0, "br": 0, "block": False}
+    grid_ds = [block_ratio + (edge_ratio)]
+    square = {"tl": 0, "br": 0, "block": False} # [[{top left:(x,y), bottom right:(xx, yy), is_block: True}]
 
-    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio + edge_ratio):
-        for j in range(0 + edge_ratio, yy - edge_ratio,  block_ratio + edge_ratio):
+    for i in range(0, xx - edge_ratio, block_ratio + edge_ratio):
+        for j in range(0, yy - edge_ratio, block_ratio + edge_ratio):
+    
             sq = square.copy()
-            sq["tl"] = (i - edge_ratio, j - edge_ratio)
-            sq["br"] = (i + block_ratio + edge_ratio, j + block_ratio + edge_ratio)
+            sq["tl"] = (i, j)
+            sq["br"] = (i + block_ratio + (2*edge_ratio), j + block_ratio + (2*edge_ratio))
      
             if    j%2 == 0 and i%2 == 0: color = (0, 0, 255)
             elif  j%2 == 0 and i%2 == 1: color = (0, 255, 0)
@@ -166,27 +167,31 @@ def grid(scaned_image):
             else: color = (255, 0, 0)
 
             cv.rectangle(scaned_image_copy, sq["tl"], sq["br"], color, 1)
-
+        
             x_index, y_index = xy_to_index(i, j, grid_ds)
-            try:
-                grid_ds[1][x_index].append(sq)
-            except IndexError:
+            if x_index == 0 and y_index == 0:
+                grid_ds.append([[sq]])
+            elif y_index == 0:
                 grid_ds[1].append([sq])
-
+            else:
+                grid_ds[1][x_index].append(sq)
+            
             """
             cv.imshow('grid', scaned_image_copy)
             cv.waitKey(0)
             cv.destroyAllWindows()
             grid_ds.append(sq)
             #"""
-        
-        """
-        cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
-        cv.line(scaned_image_copy, (i + block_ratio, 0), (i + block_ratio, xx), (0, 255, 0), 1)
+    
+    """
+    for i in range(0 + edge_ratio, xx - edge_ratio,  block_ratio + edge_ratio):
+        for j in range(0 + edge_ratio, yy - edge_ratio,  block_ratio + edge_ratio):
+            cv.line(scaned_image_copy, (i, 0), (i, xx), (0, 255, 0), 1)
+            cv.line(scaned_image_copy, (i + block_ratio, 0), (i + block_ratio, xx), (0, 255, 0), 1)
 
-        cv.line(scaned_image_copy, (0, i), (yy, i), (0, 255, 0), 1)
-        cv.line(scaned_image_copy, (0, i + block_ratio), (yy, i + block_ratio), (0, 255, 0), 1)
-        """
+            cv.line(scaned_image_copy, (0, i), (yy, i), (0, 255, 0), 1)
+            cv.line(scaned_image_copy, (0, i + block_ratio), (yy, i + block_ratio), (0, 255, 0), 1)
+    #"""
 
     #"""
     cv.imshow('grid', scaned_image_copy)
@@ -196,7 +201,6 @@ def grid(scaned_image):
     #"""
 
     print(f"{len(grid_ds[1])} x {len(grid_ds[1][0])} ")
-
 
 
 # create a function that translates the x,y coordinates of a pin to the equivalent index of grid_ds.
@@ -215,8 +219,8 @@ def xy_to_index(x, y, grid_ds):
     Index of the pin in grid_ds
     """
     
-    x_index = int(round(x / grid_ds[0], 1))
-    y_index = int(round(y / grid_ds[0], 1))
+    x_index = int(round(x / grid_ds[0]))
+    y_index = int(round(y / grid_ds[0]))
 
     return (x_index, y_index)
    
