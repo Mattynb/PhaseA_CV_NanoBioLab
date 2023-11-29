@@ -1,6 +1,6 @@
 from Image.image_class import Image
 from Image.image_loader import Image_load
-from Image.objs import Grid
+from objs import Grid
 
 import Image.image_preprocess as pp
 
@@ -18,24 +18,22 @@ def main(path_to_imgs):
 
     # creating Image objects
     id = 0
-    Images = []
     for img in images_og:
         try:
-            Images.append(Image(id, img, 0.4))  
+            Image_i = Image(id, img, 0.4)
             print(f"Image {id} loaded")
             id += 1
+        
         except AttributeError:
             print("\nImage not loaded, check path\n")
+            break
 
-    # finding pins
-    for img in Images:
-        Grid_DS = Grid(img.img_scan)
-        Grid_DS.show_gridLines()
-        contours = pp.pre_process(img.img_scan)
-        Grid_DS.find_block(contours)
+        Grid_DS = Grid(Image_i.img_scan)
+        contours = pp.pre_process(Image_i.img_scan)
+        Grid_DS.find_blocks(contours)
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.JPEG" #IMG_5020.JPEG
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\*" #IMG_5020.JPEG
     main(path_to_imgs)
 
 

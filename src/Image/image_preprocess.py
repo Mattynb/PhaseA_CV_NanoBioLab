@@ -3,28 +3,42 @@ import cv2 as cv
 
 # A function that pre-processes the image to isolate the color of the pins.
 def pre_process(scaned_image):
+    """
+    ### Pre-process
+    ---------------
+    Function that isolates the color of the pins.
+
+    #### Args:
+    scaned_image: image to be pre-processed
+
+    #### Returns:
+    List of contours
+    """
 
     scaned_image_copy = scaned_image.copy()
-
-    # Convert the image to HSV color space
-    img_hsv = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HSV)
-
+    
     # Define the lower and upper bounds for the color you want to isolate
-    lower_color = np.array([0, 50, 0])
-    upper_color = np.array([255, 255, 255])
-
-    """kernel = np.ones((9,9), np.uint8)
-    img_hsv = cv2.morphologyEx(img_hsv, cv2.MORPH_CLOSE, kernel, iterations=2)
     """
-    # Create a mask using the inRange function
-    color_mask = cv.inRange(img_hsv, lower_color, upper_color)
+    # Hue   Light   Saturation
+    img_hls = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HLS)
+    lower_color = np.array([0, 0, 55])
+    upper_color = np.array([179, 255, 255])
+    hls_color_mask = cv.inRange(img_hls, lower_color, upper_color)
+    #"""
+    
+    # Hue   Saturation  Value 
+    img_hsv = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HSV)
+    hsv_lower_color = np.array([0, 55, 0])
+    hsv_upper_color = np.array([180, 255, 255])
+    color_mask = cv.inRange(img_hsv, hsv_lower_color, hsv_upper_color)
+    
+    #color_mask = cv.bitwise_and(hsv_color_mask, hls_color_mask)
 
-    # blur the mask to help remove noise, then apply the mask to the frame 
-    #color_mask = cv.medianBlur(color_mask, 5)
- 
     """
     cv.imshow('img_hsv', img_hsv)
-    cv.imshow('mask', color_mask)
+    cv.imshow('img_hls', img_hls)
+    cv.imshow('hsv_color_mask', hsv_color_mask)
+    cv.imshow('hls_color_mask', hls_color_mask)
     cv.waitKey(0)
     cv.destroyAllWindows()
     #"""
@@ -42,13 +56,15 @@ def pre_process(scaned_image):
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
     """
-    cv.imshow('edge', edges)
-    cv.imshow('mask', color_mask)
+    #cv.imshow('edge', edges)
+    cv.imshow('result', result)
     cv.waitKey(0)
     cv.destroyAllWindows()#"""
 
     return contours
 
+
+# A function that draws a rectangle around the recognized pins. Not being used right now. Instead using Grid.find_blocks() from src/objs.py
 def draw_recognized(result, scaned_image) -> list:
     """
     ### Draw recognized
@@ -87,16 +103,7 @@ def draw_recognized(result, scaned_image) -> list:
 
     return contours
 
-
-
-
-
-
-
-
-
-
-# function for testing parameters 
+# A function for testing parameters. Not being used right now. 
 def adaptive_pre_process(scaned_image):
     """
     ### Adaptive pre-process
