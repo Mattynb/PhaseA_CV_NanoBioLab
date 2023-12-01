@@ -36,9 +36,10 @@ def pre_process(scaned_image):
 
     """
     cv.imshow('img_hsv', img_hsv)
-    cv.imshow('img_hls', img_hls)
-    cv.imshow('hsv_color_mask', hsv_color_mask)
-    cv.imshow('hls_color_mask', hls_color_mask)
+    #cv.imshow('img_hls', img_hls)
+    #cv.imshow('hsv_color_mask', hsv_color_mask)
+    #cv.imshow('hls_color_mask', hls_color_mask)
+    cv.imshow('color_mask', color_mask)
     cv.waitKey(0)
     cv.destroyAllWindows()
     #"""
@@ -56,7 +57,6 @@ def pre_process(scaned_image):
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
     """
-    #cv.imshow('edge', edges)
     cv.imshow('result', result)
     cv.waitKey(0)
     cv.destroyAllWindows()#"""

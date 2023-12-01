@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+from skimage import measure
 
 class Grid:
     """
@@ -153,38 +154,67 @@ class Grid:
             x, y, w, h = cv.boundingRect(p_pin)
 
             # checks if the contour is around the size of a pin. 
-            if  h <= self.PIN_RATIO + self.PLUS_MINUS and w <= self.PIN_RATIO + self.PLUS_MINUS: 
-                if h > self.PIN_RATIO - self.PLUS_MINUS and w > self.PIN_RATIO - self.PLUS_MINUS: 
-                    cv.rectangle(image_copy, (x, y), (x+self.PIN_RATIO, y+self.PIN_RATIO), (0, 255, 0), 1)
+            if  h <= self.PIN_RATIO + (2*self.PLUS_MINUS) and w <= self.PIN_RATIO + (2*self.PLUS_MINUS): 
+                if h > self.PIN_RATIO - (2*self.PLUS_MINUS) and w > self.PIN_RATIO - (2*self.PLUS_MINUS): 
+                
                     x_index, y_index = self.xy_to_index(x, y) 
 
                     x_index = min(x_index, self.MAX_INDEX)
                     y_index = min(y_index, self.MAX_INDEX)
-                
-                    print(f"RGB of pin at {x_index}, {y_index}: {self.get_rbg_avg_of_area(x, y, w, h)}")
+
+                                    
+                    print(f"RGB of pin at {x_index}, {y_index}: {self.get_rgb_avg_of_contour(p_pin)}")
                     
+                    self.grid[x_index][y_index].add_pin(p_pin)
                     self.grid[x_index][y_index].pin_count += 1
 
         # squares with n or more pins are considered blocks
         blocks_found = 0
         for x in self.grid:
-            for y in x:
-                if y.pin_count >= 2:
-                    y.is_block = True
-                    #print(f"block found at {self.xy_to_index(y.tl[0], y.tl[1])}")
-                    cv.rectangle(image_copy, y.tl, y.br, (255, 0, 0), 1)
-                    cv.rectangle(image_copy, (y.tl[0]-self.EDGE_RATIO, y.tl[1]-self.EDGE_RATIO), (y.br[0]+self.EDGE_RATIO, y.br[1]+self.EDGE_RATIO), (0, 255, 0), 1)
+            for sq in x:
+                if sq.pin_count >= 2:
+                    sq.is_block = True
+
+                    sq.draw_pins(image_copy)
+
+                    cv.rectangle(image_copy, sq.tl, sq.br, (255, 0, 0), 1)
+                    cv.rectangle(image_copy, (sq.tl[0]-self.EDGE_RATIO, sq.tl[1]-self.EDGE_RATIO), (sq.br[0]+self.EDGE_RATIO, sq.br[1]+self.EDGE_RATIO), (0, 255, 0), 1)
                     blocks_found += 1
         
         print(f"blocks found: {blocks_found}")
             
-        '''
-        cv.imshow('block', image_copy)
+        #'''
+        cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
         #'''
 
-    def get_rbg_avg_of_area(self, x, y, w, h):
+    def get_rgb_avg_of_contour(self, contour):
+        """
+        ### Get RGB average of contour
+        ---------------
+        Function that gets the average RGB of a contour in the image.
+        
+        #### Args:
+        * contour: Contour of the object in the image.
+        
+        #### Returns:
+        * avg_color: Average RGB color of the contour.
+        """
+        
+        regions = measure.regionprops(contour)
+
+
+        # RGB values of pixels in the contour
+        region_rgb_values = self.img[contour[:, :, 1], contour[:, :, 0]]
+        
+        # get the average of each channel
+        avg_RGB = np.mean(region_rgb_values, axis=0)
+
+        B, G, R = avg_RGB[0][0], avg_RGB[0][1], avg_RGB[0][2]
+        return (round(R), round(G), round(B))
+
+    def get_rgb_avg_of_area(self, x, y, w, h):
         """ 
         ### Get RGB average of area
         ---------------
@@ -236,6 +266,7 @@ class Grid:
                 cv.line(img, (0, i + self.SQUARE_RATIO), (self.MAX_XY, i + self.SQUARE_RATIO), (0, 255, 0), 1)
 
         cv.imshow('grid', img)
+        cv.imwrite(r'C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\src\Image\demo_imgs\grid.jpg', img)
         cv.waitKey(0)
         cv.destroyAllWindows()
 
@@ -267,11 +298,16 @@ class Square:
         self.is_Block = False
         self.contour_count = 0
         self.pin_count = 0
+        self.pins = []
 
         # coordinates and index in Grid
         self.tl = tl; self.br = br
         self.index = index
+    
+    def add_pin(self, pin):
+        self.pins.append(pin)
         
-
-        
+    def draw_pins(self, image):
+        for pin in self.pins:
+            cv.drawContours(image, pin, -1, (0, 255, 0), 1)
 

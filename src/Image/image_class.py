@@ -30,15 +30,16 @@ class Image:
         self.id = id
         
         self.img_og = image_og
+
         self.img_resized = self.resize_2_std(image_og, resize_factor)
 
+       
         w, h = self.img_resized.shape[:2]
         self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
 
+       
         #self.img_std = pre_process(self.img_scan)
 
-
-       
     def resize_2_std(self, img, factor=0.25, w= None, h = None):
         """
         ### Resize image
