@@ -29,6 +29,7 @@ def main(path_to_imgs):
             break
 
         Grid_DS = Grid(Image_i.img_scan)
+        Grid_DS.show_gridLines()
         contours = pp.pre_process(Image_i.img_scan)
         Grid_DS.find_blocks(contours)
 
@@ -36,14 +37,4 @@ if __name__ == '__main__':
     path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\*" #IMG_5020.JPEG
     main(path_to_imgs)
 
-    print("next step: look at block corners for pins, get a new dataset, then encoding")
-
-
-
-
-
-            
-
-
-
-
+    print("get a new dataset, then encoding")

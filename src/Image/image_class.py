@@ -26,16 +26,18 @@ class Image:
     resize_2_std(img, factor=0.25)
         Resizes image to a standard size
     """
-    def __init__(self, id = randint(0, 100), image_og = MatLike, resize_factor = 0.15):
+    def __init__(self, id, image_og = MatLike, resize_factor = 0.15):
         self.id = id
         
         self.img_og = image_og
 
+        
+        
         self.img_resized = self.resize_2_std(image_og, resize_factor)
-
+        
        
         w, h = self.img_resized.shape[:2]
-        self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
+        self.img_scan = image_og #self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
 
        
         #self.img_std = pre_process(self.img_scan)
