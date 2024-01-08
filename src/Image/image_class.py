@@ -37,7 +37,7 @@ class Image:
         
        
         w, h = self.img_resized.shape[:2]
-        self.img_scan = image_og #self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
+        self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
 
        
         #self.img_std = pre_process(self.img_scan)
