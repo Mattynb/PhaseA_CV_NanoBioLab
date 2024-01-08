@@ -24,7 +24,7 @@ Before running the code, make sure you have the following prerequisites installe
 Clone this repository to your local machine:
 
 ```bash
-git clone "https://github.com/mattynb/your-repo.git"
+git clone "https://github.com/mattynb/PhaseA_CV_NanoBioLab.git"
 ```
 
 ### Usage
