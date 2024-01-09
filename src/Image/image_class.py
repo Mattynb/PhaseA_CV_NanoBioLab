@@ -1,6 +1,5 @@
 import cv2 as cv
 from cv2.typing import MatLike
-from random import randint
 from Image.image_scanner import Image_scan
 
 #from Image.image_preprocess import pre_process
@@ -32,14 +31,13 @@ class Image:
         self.img_og = image_og
 
         
-        
         self.img_resized = self.resize_2_std(image_og, resize_factor)
         
        
         w, h = self.img_resized.shape[:2]
         self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
 
-       
+        #self.show_steps()
         #self.img_std = pre_process(self.img_scan)
 
     def resize_2_std(self, img, factor=0.25, w= None, h = None):
@@ -59,6 +57,11 @@ class Image:
         return cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_LINEAR)
 
 
+    def show_steps(self):
 
+        cv.imshow('resized', self.img_resized)
+        cv.imshow('scanned', self.img_scan)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
 
 

@@ -157,7 +157,7 @@ class Grid:
         # checks if the pin is in the corners of the square and adds it to the square if it is
         for x in self.grid:
             for sq in x:
-                if sq.p_pin_count >= 2:
+                if sq.p_pin_count >= 3:
                     for p_pin in sq.p_pins:
                         x, y, w, h = cv.boundingRect(p_pin)
                         
@@ -167,10 +167,7 @@ class Grid:
                             sq.draw_pins(image_copy)
                             sq.draw_corners(image_copy)
 
-                    c,r = sq.index
-                    print("Square at index: ", (r,c) , "{")
-                    sq.get_pins_rgb()
-                    print("}")
+                    
                             
         blocks_found = 0
         for x in self.grid:
@@ -179,13 +176,16 @@ class Grid:
                     sq.is_block = True
                     blocks_found += 1
 
+                    c,r = sq.index
+                    print("Square at index: ", (r,c) , "{")
+                    sq.get_pins_rgb()
+                    print("}\n")
+
         #'''
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
         #'''
-
-
 
     def get_rgb_avg_of_area(self, x, y, w, h):
         """ 
@@ -282,15 +282,14 @@ class Square:
     * pin_count: number of pins in the square
     """
     def __init__(self, tl, br, index, PIN_RATIO, PLUS_MINUS, img=None):
-        
-        # identification and cropped image
         #self.id = id
         self.img = img
-        self.is_Block = False
-        self.contour_count = 0
         self.p_pin_count = 0
         self.p_pins = []
         self.pins = []
+
+        self.is_block = False
+        self.block_type = ''
 
         # coordinates and index in Grid
         self.tl = tl; self.br = br
@@ -378,7 +377,7 @@ class Square:
 
 
 
-    def get_rgb_avg_of_contour(self, contour, corner=''):
+    def get_rgb_avg_of_contour(self, contour, corner='', print_flag = 1):
         """
         ### Get RGB average of contour
         ---------------
@@ -396,7 +395,6 @@ class Square:
         
         image = cv.cvtColor(image_copy, cv.COLOR_BGR2RGB)  # Convert to RGB format
 
-        # Assuming 'contour' is your contour and 'image' is your image
         mask = np.zeros(image.shape[:2], dtype=np.uint8)  # Create a mask with the same height and width as the image
         cv.drawContours(mask, [contour], 0, (255), -1)  # Fill the contour on the mask
 
@@ -405,14 +403,17 @@ class Square:
 
         # Calculate the average RGB values
         average_rgb = np.mean(pixels_inside, axis=0)
+        
+        if print_flag:
+            print(f"     {corner}: ", [round(x) for x in average_rgb ])
 
-        print(f"     {corner}: ", [ round(x) for x in average_rgb ])
+        return [round(x) for x in average_rgb ]
 
-    def get_pins_rgb(self):
+    def get_pins_rgb(self, pf=1):
         pins_rgb = []
 
         for pins in self.pins:
             corner = self.what_corner_is_contour(pins)
-            pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner))
+            pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner, pf))
 
-        return pins_rgb  # tl, tr, bl, br corners 
+        return pins_rgb, corner  # tr, tl, br, bl corners 
