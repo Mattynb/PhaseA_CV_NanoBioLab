@@ -1,8 +1,6 @@
-from Image.image_class import Image
-from Image.image_loader import Image_load
+from image import Image, image_loader, pre_process
 from objs import Grid
 
-import Image.image_preprocess as pp
 from backend import identify_blocks
 
 def main(path_to_imgs):
@@ -15,11 +13,11 @@ def main(path_to_imgs):
     """
 
     # loading images
-    images_og = Image_load(path_to_imgs)
+    original_images = image_loader(path_to_imgs)
 
     # creating Image objects
     id = 0
-    for img in images_og:
+    for img in original_images:
         try:
             Image_i = Image(id, img, 0.4)
             print(f"Image {id} loaded")
@@ -31,7 +29,7 @@ def main(path_to_imgs):
 
         Grid_DS = Grid(Image_i.img_scan)
         Grid_DS.show_gridLines()
-        contours = pp.pre_process(Image_i.img_scan)
+        contours = pre_process(Image_i.img_scan)
         Grid_DS.find_blocks(contours)
 
         identify_blocks(Grid_DS)

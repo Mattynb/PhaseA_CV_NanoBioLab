@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-def Image_scan(std_size_img):
+def image_scaner(std_size_img):
         """
         ### Image scanner
         Scans the image and returns the scanned image. It does that by first removing the background, then finding the corners of the grid and finally rearranging the corners to get a straight image.

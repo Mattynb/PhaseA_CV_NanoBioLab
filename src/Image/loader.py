@@ -4,7 +4,7 @@ from glob import glob
 import pillow_heif
 import cv2 as cv
 
-def Image_load(path_to_images):
+def image_loader(path_to_images):
     """
     ### Image loader
     Loads all the images in a folder and returns a list of images

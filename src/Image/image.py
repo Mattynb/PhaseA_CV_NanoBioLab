@@ -1,6 +1,6 @@
 import cv2 as cv
 from cv2.typing import MatLike
-from Image.image_scanner import Image_scan
+from .scanner import image_scaner
 
 #from Image.image_preprocess import pre_process
 
@@ -35,7 +35,7 @@ class Image:
         
        
         w, h = self.img_resized.shape[:2]
-        self.img_scan = self.resize_2_std(Image_scan(self.img_resized), 1, w, w)
+        self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
 
         #self.show_steps()
         #self.img_std = pre_process(self.img_scan)

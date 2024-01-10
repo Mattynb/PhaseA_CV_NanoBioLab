@@ -1,4 +1,4 @@
-from Image.image_class import Image
+from image import Image
 from Image.image_loader import Image_load
 import Image.image_preprocess as pp
 import numpy as np
