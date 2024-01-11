@@ -6,49 +6,51 @@ from .scanner import image_scaner
 
 class Image:
     """
-    ### Image class
     ---------------
-    Class that contains all the information of an image
+    Class that represents an image. It contains the original image, the resized image and the scanned image.
+    
+    #### Args:
+    * id : image id (int)
+    * image_og : original image (MatLike)
+    * resize_factor : factor to resize the image (float)
 
     #### Attributes:
-    ---------------
     * id : image id (int)
-    * img_og : original image (MatLike) 
+    * img_og : original image (MatLike)
     * img_resized : resized image (MatLike)
-    * img_std : scanned image (MatLike)
+    * img_scan : scanned image (MatLike)
 
     #### Methods:
-    ---------------
-    pre_process()
-        work in progress
-    
-    resize_2_std(img, factor=0.25)
-        Resizes image to a standard size
+    * resize_2_std : resize image to a standard size
+    * show_steps : show the steps img_og -> img_resized -> img_scan
     """
-    def __init__(self, id, image_og: MatLike, resize_factor = 0.15):
+    def __init__(self, id: int, image_og: MatLike, resize_factor : float = 0.15):
         self.id = id
         
-        self.img_og = image_og
+        self.img_og = image_og  # original image
 
+        # resizing image to fit in screen
+        self.img_resized: MatLike = self.resize_2_std(image_og, resize_factor)
         
-        self.img_resized = self.resize_2_std(image_og, resize_factor)
-        
-       
-        w, h = self.img_resized.shape[:2]
+        # scanning the grid in the image
+        w, h = self.img_resized.shape[:2] 
         self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
 
         #self.show_steps()
 
-    def resize_2_std(self, img, factor, w= None, h = None):
+    def resize_2_std(self, img: MatLike, factor: float, w:int=None, h:int = None):
         """
         ### Resize image
-        Resizes image to a standard size
+        Resize image to a given percentage of current size.
 
-        #### Args:  
-        img: image to be resized
+        #### Args:
+        * img : image to be resized
+        * factor : percentage of current size to resize to
+        * w : width of image
+        * h : height of image
 
         #### Returns:
-        Resized image
+        * resized image
         """
         if w == None and h == None:
             w, h = img.shape[:2]
@@ -59,7 +61,12 @@ class Image:
 
 
     def show_steps(self):
-
+        """
+        ### Show steps
+        Show the steps img_og -> img_resized -> img_scan
+        """
+        
+        cv.imshow('original', self.img_og)
         cv.imshow('resized', self.img_resized)
         cv.imshow('scanned', self.img_scan)
         cv.waitKey(0)

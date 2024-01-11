@@ -1,12 +1,14 @@
+from re import M
 import numpy as np
 import cv2 as cv
+from cv2.typing import MatLike
 
 # A function that pre-processes the image to isolate the color of the pins.
-def pre_process(scaned_image):
+def pre_process(scaned_image:MatLike):
     """
     ### Pre-process
     ---------------
-    Function that isolates the color of the pins.
+    Function that pre-processes the image to isolate the color of the pins.
 
     #### Args:
     scaned_image: image to be pre-processed
@@ -17,52 +19,25 @@ def pre_process(scaned_image):
 
     scaned_image_copy = scaned_image.copy()
     
-    """
-    # Define the lower and upper bounds for the color you want to isolate
-    
-    # Hue   Light   Saturation
-    img_hls = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HLS)
-    lower_color = np.array([0, 0, 55])
-    upper_color = np.array([179, 255, 255])
-    hls_color_mask = cv.inRange(img_hls, lower_color, upper_color)
-    #"""
-    
-    # Hue   Saturation  Value 
+    # Convert the image to HSV color space. Hue Saturation Value.
     img_hsv = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HSV)
 
     # Define the lower and upper bounds for the color you want to isolate
     hsv_lower_color = np.array([0, 55, 0])
     hsv_upper_color = np.array([180, 255, 255])
 
-    
-    """
-    #color_mask = cv.bitwise_and(hsv_color_mask, hls_color_mask)
-
-    cv.imshow('img_hsv', img_hsv)
-    #cv.imshow('img_hls', img_hls)
-    #cv.imshow('hsv_color_mask', hsv_color_mask)
-    #cv.imshow('hls_color_mask', hls_color_mask)
-    cv.imshow('color_mask', color_mask)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-    
-    # Apply the mask to the original image using bitwise_and
-    result = cv.bitwise_and(scaned_image_copy, scaned_image_copy, mask=color_mask)
-    
-    draw_recognized(result, scaned_image_copy)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-    #"""
-    
-    # Create a mask using the inRange function and apply it to the image using bitwise_and
+    # Create a mask to filter out the grayscale colors isolating the color of the pins.
     color_mask = cv.inRange(img_hsv, hsv_lower_color, hsv_upper_color)
     edges = cv.Canny(color_mask, 0, 255)
+
+    # Find the contours around the edges of the color mask.
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
+    # Show the result of the pre-processing.
     """
     cv.imshow('result', result)
     cv.waitKey(0)
-    cv.destroyAllWindows()\
+    cv.destroyAllWindows()
     #"""
 
     return contours

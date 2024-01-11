@@ -1,3 +1,4 @@
+from ast import Tuple
 import cv2 as cv
 import numpy as np
 
@@ -19,9 +20,9 @@ class Square:
     * block: boolean that indicates if the square is a block
     * pin_count: number of pins in the square
     """
-    def __init__(self, tl, br, index, PIN_RATIO, PLUS_MINUS, img=None):
+    def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img = None):
         #self.id = id
-        self.img = img
+        
         self.p_pin_count = 0
         self.p_pins = []
         self.pins = []
@@ -34,7 +35,9 @@ class Square:
         self.index = index
 
         self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
-    
+        self.img = img.copy()
+        self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
+
 
     def add_p_pin(self, p_pin):
         self.p_pins.append(p_pin)
@@ -50,26 +53,66 @@ class Square:
         for corner in self.corners:
             cv.rectangle(img, corner[0], corner[1], (0, 0, 255), 1)
 
+    def createImg(self, img):
+        return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
-    def add_corners(self, PIN_RATIO, PLUS_MINUS):
+    def add_corners(self, PIN_RATIO, PLUS_MINUS, p=3, a = 1.5):
+
+        tl_x, tl_y = self.tl
+        br_x, br_y = self.br
+        
+        if self.index[0] != 4:
+            SKEW_x = int((abs(self.index[0] - 4) ** a) * ((self.index[0] - 4)/ abs(self.index[0] - 4)))
+        else:
+            SKEW_x = 0
+        
+        if self.index[1] != 4:
+            SKEW_y = int((abs(self.index[1] - 4) ** a) * ((self.index[1] - 4)/ abs(self.index[1] - 4)))
+        else:
+            SKEW_y = 0
+        
         top_right = (
-            (self.tl[0]-(2*PLUS_MINUS), self.tl[1]-(2*PLUS_MINUS)),
-            (self.tl[0]+PIN_RATIO+(2*PLUS_MINUS), self.tl[1]+PIN_RATIO+(2*PLUS_MINUS))
+            (
+                tl_x - (p*PLUS_MINUS) + SKEW_x, 
+                tl_y - (p*PLUS_MINUS) + SKEW_y
+            ),
+            (
+                tl_x + PIN_RATIO + (p*PLUS_MINUS) + SKEW_x, 
+                tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y
+            )
         )
 
         top_left = (
-            (self.br[0]-PIN_RATIO-(2*PLUS_MINUS), self.tl[1]-(2*PLUS_MINUS)),
-            (self.br[0]+(2*PLUS_MINUS), self.tl[1]+PIN_RATIO+(2*PLUS_MINUS)),
+            (
+                br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x,
+                tl_y - (p*PLUS_MINUS) + SKEW_y
+            ),
+            (
+                br_x + (p*PLUS_MINUS) + SKEW_x,
+                tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y
+            )
         )
 
         bottom_right = (
-            (self.tl[0]-(2*PLUS_MINUS), self.br[1]-PIN_RATIO-(2*PLUS_MINUS)),
-            (self.tl[0]+PIN_RATIO+(2*PLUS_MINUS), self.br[1]+(2*PLUS_MINUS)),
+            (
+                tl_x - (p*PLUS_MINUS) + SKEW_x, 
+                br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y
+            ),
+            (
+                tl_x + PIN_RATIO+(p*PLUS_MINUS) + SKEW_x, 
+                br_y + (p*PLUS_MINUS) + SKEW_y
+            )
         )
 
         bottom_left = (
-            (self.br[0]-PIN_RATIO-(2*PLUS_MINUS), self.br[1]-PIN_RATIO-(2*PLUS_MINUS)),
-            (self.br[0]+(2*PLUS_MINUS), self.br[1]+(2*PLUS_MINUS)),
+            (
+                br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x,
+                br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y
+            ),
+            (
+                br_x + (p*PLUS_MINUS) + SKEW_x, 
+                br_y + (p*PLUS_MINUS) + SKEW_y
+            )
         )
 
         return [top_left, top_right, bottom_left, bottom_right]
@@ -87,7 +130,7 @@ class Square:
 
         return False
     
-    def what_corner_is_contour(self, contour):
+    def which_corner_is_contour_in(self, contour):
         corn = ["top_right", "top_left", "bottom_right", "bottom_left" ]
 
         x, y = cv.boundingRect(contour)[:2]
@@ -99,6 +142,8 @@ class Square:
                     return corn[i]
             i += 1
 
+
+        # might be unecessary after corner skewing
         i =0
         for corner in self.corners:
             if x + 5 >= corner[0][0] and x + 5 <= corner[1][0]:
@@ -130,7 +175,7 @@ class Square:
 
         # crop the image
         image_copy = self.img.copy()
-        
+
         image = cv.cvtColor(image_copy, cv.COLOR_BGR2RGB)  # Convert to RGB format
 
         mask = np.zeros(image.shape[:2], dtype=np.uint8)  # Create a mask with the same height and width as the image
@@ -142,6 +187,9 @@ class Square:
         # Calculate the average RGB values
         average_rgb = np.mean(pixels_inside, axis=0)
         
+        # Remove NaN values 
+        average_rgb = np.nan_to_num(average_rgb)
+
         if print_flag:
             print(f"     {corner}: ", [round(x) for x in average_rgb ])
 
@@ -151,7 +199,7 @@ class Square:
         pins_rgb = []
 
         for pins in self.pins:
-            corner = self.what_corner_is_contour(pins)
+            corner = self.which_corner_is_contour_in(pins)
             pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner, pf))
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
