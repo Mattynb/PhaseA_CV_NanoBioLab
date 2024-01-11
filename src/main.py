@@ -19,7 +19,7 @@ def main(path_to_imgs):
     id = 0
     for img in original_images:
         try:
-            Image_i = Image(id, img, 0.4)
+            Image_i = Image(id, img, 0.3)
             print(f"Image {id} loaded")
             id += 1
         
@@ -27,8 +27,8 @@ def main(path_to_imgs):
             print("\nImage not loaded, check path\n")
             break
 
-        Grid_DS = Grid(Image_i.img_scan)
-        Grid_DS.show_gridLines()
+        Grid_DS = Grid(Image_i.img_scan); Grid_DS.show_gridLines()
+        
         contours = pre_process(Image_i.img_scan)
         Grid_DS.find_blocks(contours)
 
@@ -36,10 +36,8 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_wit_block_A_B\IMG_5190.jpeg"    #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\*" #IMG_5020.JPEG
+    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_wit_block_A_B\IMG_5190.jpeg"    #IMG_5020.JPEG
     main(path_to_imgs)
-
-    print("get a new dataset, then encoding")
 
 
 """
@@ -51,4 +49,8 @@ implement the __init__.py (aka index.js) file for every folder
 
 TODO:
 Apply SOLID
+
+TODO: 
+Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.
+
 """

@@ -25,7 +25,7 @@ class Image:
     resize_2_std(img, factor=0.25)
         Resizes image to a standard size
     """
-    def __init__(self, id, image_og = MatLike, resize_factor = 0.15):
+    def __init__(self, id, image_og: MatLike, resize_factor = 0.15):
         self.id = id
         
         self.img_og = image_og
@@ -38,9 +38,8 @@ class Image:
         self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
 
         #self.show_steps()
-        #self.img_std = pre_process(self.img_scan)
 
-    def resize_2_std(self, img, factor=0.25, w= None, h = None):
+    def resize_2_std(self, img, factor, w= None, h = None):
         """
         ### Resize image
         Resizes image to a standard size
@@ -53,8 +52,10 @@ class Image:
         """
         if w == None and h == None:
             w, h = img.shape[:2]
+
+        resized_image = cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_LINEAR)
         
-        return cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_LINEAR)
+        return resized_image
 
 
     def show_steps(self):

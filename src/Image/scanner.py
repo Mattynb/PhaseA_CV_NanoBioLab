@@ -18,7 +18,7 @@ def image_scaner(std_size_img):
         
         # copy of the image to be scanned (to not mess with the original)
         img = std_size_img.copy()
-        #"""
+        """
         cv.imshow('og', img)
         cv.waitKey(0)  
         cv.destroyAllWindows()
@@ -28,7 +28,7 @@ def image_scaner(std_size_img):
         # APPLYING MORPHOLOGICAL TRANSFORMATIONS TO HIGHLIGHT THE GRID
         kernel = np.ones((5,5), np.uint8)
         img = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel, iterations=3)  
-        #"""
+        """
         cv.imshow('morph', img)
         cv.waitKey(0)  
         cv.destroyAllWindows()
@@ -42,7 +42,7 @@ def image_scaner(std_size_img):
         cv.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv.GC_INIT_WITH_RECT)
         mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
         img = img*mask2[:,:,np.newaxis]
-        #"""
+        """
         cv.imshow('no_bkg', img)
         cv.waitKey(0)  
         cv.destroyAllWindows()
@@ -61,7 +61,7 @@ def image_scaner(std_size_img):
         # Keeping only the largest detected contour.
         page = sorted(contours, key=cv.contourArea, reverse=True)[:5]
         con = cv.drawContours(con, page, -1, (0, 255, 255), 3)
-        #"""
+        """
         cv.imshow('contour', con)
         cv.waitKey(0)  
         cv.destroyAllWindows()
@@ -86,7 +86,7 @@ def image_scaner(std_size_img):
         for index, c in enumerate(corners):
             character = chr(65 + index)
             cv.putText(con, character, tuple(c), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv.LINE_AA)
-        #"""
+        """
         cv.imshow('contour', con)
         cv.waitKey(0)  
         cv.destroyAllWindows()
@@ -95,7 +95,7 @@ def image_scaner(std_size_img):
         # REARRANGING THE CORNERS 
         destination_corners = find_dest(corners)
 
-        # Getting the homography.
+        # Getting the homography. (aka scanning the image)
         M = cv.getPerspectiveTransform(np.float32(corners), np.float32(destination_corners))
         # Perspective transform using homography.
         final = cv.warpPerspective(std_size_img, M, (destination_corners[2][0], destination_corners[2][1]), flags=cv.INTER_LINEAR)

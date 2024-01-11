@@ -1,6 +1,5 @@
 from image import Image
-from Image.image_loader import Image_load
-import Image.image_preprocess as pp
+from image import image_loader, pre_process as pp
 import numpy as np
 import cv2 as cv
 import numpy as np
@@ -157,7 +156,7 @@ def main(path_to_imgs):
     """
 
     # loading images
-    images_og = Image_load(path_to_imgs)
+    images_og = image_loader(path_to_imgs)
 
     # creating Image objects
     id = 1

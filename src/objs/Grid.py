@@ -1,5 +1,4 @@
 import cv2 as cv
-import numpy as np
 from .Square import Square
 
 class Grid:
@@ -12,15 +11,17 @@ class Grid:
     * img: scanned image of the grid
 
     #### Attributes:
-    * img: scanned image of the grid 
+    * img: scanned image of the grid
     * MAX_XY: maximum x,y coordinate of the image (assumes image is square)
-    * PIN_RATIO: ratio of the pin size 
-    * EDGE_RATIO: ratio of the edge size 
-    * SQUARE_RATIO: ratio of the square size 
-    * PLUS_MINUS: tolerance for the pin size 
-    * SQUARE_LENGTH: length of the square (SQUARE_RATIO + EDGE_RATIO)
-    * MAX_INDEX: maximum index of the grid (9)
     * grid: "map" (list of lists) of squares in the grid.
+    
+        -Ratios measured experimentally as a percentage of the grid:
+    * PIN_RATIO: size of pin diameter/grid size
+    * EDGE_RATIO: size of edge/grid size. Edge is the "lines" around squares 
+    * SQUARE_RATIO: squares are the places where you can insert the ampli blocks
+    * PLUS_MINUS: an arbitrary general tolerance
+    * SQUARE_LENGTH: length of the "outer" square (SQUARE_RATIO + EDGE_RATIO)
+    * MAX_INDEX: maximum index of the grid (9 for a 10x10 grid)
     """
     def __init__(self, img):
         # scanned image
@@ -39,56 +40,6 @@ class Grid:
 
         
         self.grid = self.create_grid()
-
-    # Translates the x,y coordinates to the equivalent index of grid_ds.
-    def xy_to_index(self, x, y):
-        """
-        ### XY to index
-        ---------------
-        Function that translates the x,y coordinates of a pin to the equivalent index of grid_ds.
-        
-        #### Args:
-        x: x coordinate of the pin
-        y: y coordinate of the pin
-        grid_ds: grid_ds:[ block_width, [[ square{tl, br, block} , ...], ...] ]
-
-        #### Returns:
-        Index of the pin in grid_ds
-        """
-
-        x_index = int(round(x // self.SQUARE_LENGTH))
-        y_index = int(round(y // self.SQUARE_LENGTH))
-
-        return (min(x_index, self.MAX_INDEX), min(y_index, self.MAX_INDEX))
-
-    # Translates the index to the equivalent x,y coordinates of grid_ds tl point.   
-    def index_to_xy(self, x_index, y_index):
-        """
-        ### Index to xy
-        ---------------
-        Function that translates the index of a pin to the equivalent x,y coordinates of grid_ds.
-        
-        #### Args:
-        x_index: x index of the pin
-        y_index: y index of the pin
-        grid_ds: grid_ds:[ block_width, [[ square{tl, br, block} , ...], ...] ]
-
-        #### Returns:
-        x,y coordinates of the pin
-        """
-        x = (x_index) * self.SQUARE_LENGTH
-        y = (y_index) * self.SQUARE_LENGTH
-
-        return (x, y) # tl point
-    
-    # Appends squares to the grid map.
-    def append(self, x_index, y_index, square):
-        """ appends square to grid_ds"""
-        
-        if self.grid[x_index][y_index] != None:
-           print('ERROR: Square already exists and is being replaced')
-       
-        self.grid[x_index][y_index] = square
     
     # Creates a "map" (list of lists) of squares in the grid.
     def create_grid(self):
@@ -112,17 +63,17 @@ class Grid:
         STEP = self.SQUARE_RATIO + self.EDGE_RATIO
 
         # create a "map" (list of lists) of squares in the grid
-        for x in range(0, STOP_XY, STEP):
-            for y in range(0, STOP_XY, STEP):
+        for y in range(0, STOP_XY, STEP):
+            for x in range(0, STOP_XY, STEP):
                 
-                x_index, y_index = self.xy_to_index(x, y)
+                x_index, y_index = xy_to_index(self, x, y)
 
                 # create a square
                 sq = Square(
-                    (x + (self.EDGE_RATIO), y + (self.EDGE_RATIO)), 
-                    (x + self.SQUARE_RATIO + (self.EDGE_RATIO), y + self.SQUARE_RATIO + (self.EDGE_RATIO)), 
-                    (x_index, y_index),
-                    self.PIN_RATIO,
+                    (x + (self.EDGE_RATIO), y + (self.EDGE_RATIO)), # top left point
+                    (x + self.SQUARE_RATIO + (self.EDGE_RATIO), y + self.SQUARE_RATIO + (self.EDGE_RATIO)), # bottom right point
+                    (x_index, y_index), # index position of the square
+                    self.PIN_RATIO, 
                     self.PLUS_MINUS,
                     self.img
                 )
@@ -176,8 +127,7 @@ class Grid:
                     sq.is_block = True
                     blocks_found += 1
 
-                    c,r = sq.index
-                    print("Square at index: ", (r,c) , "{")
+                    print("Square at index: ", sq.index , "{")
                     sq.get_pins_rgb()
                     print("}\n")
 
@@ -187,33 +137,7 @@ class Grid:
         cv.destroyAllWindows()
         #'''
 
-    def get_rgb_avg_of_area(self, x, y, w, h):
-        """ 
-        ### Get RGB average of area
-        ---------------
-        Function that gets the average RGB of an area of the image.
-        
-        #### Args:
-        * x: x coordinate of the top left point of the area
-        * y: y coordinate of the top left point of the area
-        * w: width of the area
-        * h: height of the area
-        
-        #### Returns:
-        * Average RGB of the area
-        """
-        
-        # crop the image
-        image_copy = self.img.copy()
-        crop = image_copy[y:y+h, x:x+w]
-
-        # get the average of each channel
-        avg_color_per_row = np.average(crop, axis=0)
-        avg_color = np.average(avg_color_per_row, axis=0)
-        avg_color = np.uint8(avg_color)
-
-        return avg_color        
-
+    
     def find_p_pins(self, contours):
 
         for p_pin in contours:
@@ -222,16 +146,22 @@ class Grid:
             if  h <= self.PIN_RATIO + (2*self.PLUS_MINUS) and w <= self.PIN_RATIO + (2*self.PLUS_MINUS): 
                 if h > self.PIN_RATIO - (2*self.PLUS_MINUS) and w > self.PIN_RATIO - (2*self.PLUS_MINUS): 
                 
-                    x_index, y_index = self.xy_to_index(x, y)
+                    x_index, y_index = xy_to_index(self, x, y)
 
                     x_index = min(x_index, self.MAX_INDEX)
                     y_index = min(y_index, self.MAX_INDEX)
 
                     self.grid[x_index][y_index].add_p_pin(p_pin)
                     self.grid[x_index][y_index].p_pin_count += 1
-
-    
-
+         
+    # Appends squares to the grid map.
+    def append(self, x_index, y_index, square):
+        """ appends square to grid_ds"""
+        
+        if self.grid[x_index][y_index] != None:
+           print('ERROR: Square already exists and is being replaced')
+       
+        self.grid[x_index][y_index] = square
 
     # Shows the grid lines on the image.
     def show_gridLines(self):
@@ -261,3 +191,47 @@ class Grid:
         cv.waitKey(0)
         cv.destroyAllWindows()
 
+
+
+#### helper functions ####
+        
+# Translates the x,y coordinates to the equivalent index of grid_ds.
+def xy_to_index(Grid:Grid , x, y):
+    """
+    ### XY to index
+    ---------------
+    Function that translates the x,y coordinates to the equivalent index of grid_ds.
+    
+    #### Args:
+    * x: x coordinate of the point
+    * y: y coordinate of the point
+    * grid_ds: Grid object
+
+    #### Returns:
+    * index of the point in the grid_ds
+    """
+
+    x_index = int(round(x // Grid.SQUARE_LENGTH))
+    y_index = int(round(y // Grid.SQUARE_LENGTH))
+
+    return (min(x_index, Grid.MAX_INDEX), min(y_index, Grid.MAX_INDEX))
+
+# Translates the index to the equivalent x,y coordinates of grid_ds tl point.   
+def index_to_xy(Grid:Grid, x_index, y_index):
+    """
+    ### Index to XY
+    ---------------
+    Function that translates the index to the equivalent x,y coordinates of grid_ds tl point.
+
+    #### Args:
+    * x_index: x index of the point
+    * y_index: y index of the point
+    * grid_ds: Grid object
+
+    #### Returns:
+    * x,y coordinates of the top left point of the square
+    """
+    x = (x_index) * Grid.SQUARE_LENGTH
+    y = (y_index) * Grid.SQUARE_LENGTH
+
+    return (x, y) # tl point
