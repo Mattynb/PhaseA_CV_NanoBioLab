@@ -1,4 +1,5 @@
 from ast import Tuple
+from re import S
 import cv2 as cv
 from cv2.typing import MatLike
 import numpy as np
@@ -69,7 +70,7 @@ class Square:
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
-    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p=3, a = 1.5):
+    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p=2, a = 2):
         """ 
         Adds the corners of the square to the square object
         
@@ -105,6 +106,11 @@ class Square:
         # Coordinates are calculated using:
         # top left and bottom right coordinates of the square, arbitrary plus minus value, the padding value and the skew value.
              
+        """
+        TODO: consider the case where one of the corners points is outside the image.
+        """
+
+
         top_right = (
             (
                 tl_x - (p*PLUS_MINUS) + SKEW_x, 

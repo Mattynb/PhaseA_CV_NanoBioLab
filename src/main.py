@@ -34,7 +34,7 @@ def main(path_to_imgs):
 
 
         # creating a grid object with the scanned image
-        Grid_DS = Grid(Image_i.img_scan); Grid_DS.show_gridLines()
+        Grid_DS = Grid(Image_i.img_scan); #Grid_DS.show_gridLines()
         
 
         # finds the contours around non-grayscale (colorful) edges in image
@@ -62,12 +62,8 @@ if __name__ == '__main__':
 
 
 """
-
-TODO:
-implement the __init__.py (aka index.js) file for every folder
-
-TODO:
-Apply SOLID
+TODO: 
+Understand why the bottom block is not recognized as a block in the image IMG_5190.JPEG 
 
 TODO: 
 Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.

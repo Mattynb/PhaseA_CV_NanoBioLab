@@ -166,6 +166,7 @@ class Grid:
 
         # shows image with pins and corners drawn
         #'''
+        self.show_gridLines()
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -238,9 +239,8 @@ class Grid:
                 cv.line(img, (0, i + self.SQUARE_RATIO), (self.MAX_XY, i + self.SQUARE_RATIO), (0, 255, 0), 1)
 
         cv.imshow('grid', img)
-        cv.imwrite(r'C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\src\Image\demo_imgs\grid.jpg', img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        #cv.waitKey(0)
+        #cv.destroyAllWindows()
 
 
 
