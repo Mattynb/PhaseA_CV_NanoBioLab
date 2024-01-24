@@ -1,5 +1,4 @@
 from ast import Tuple
-from re import S
 import cv2 as cv
 from cv2.typing import MatLike
 import numpy as np
@@ -21,12 +20,24 @@ class Square:
     * index: index of the square in the grid_ds
     * block: boolean that indicates if the square is a block
     * pin_count: number of pins in the square
+
+    #### Methods:
+    * add_p_pin: adds a potential pin to the square
+    * add_pin: adds a pin to the square
+    * draw_pins: draws the pins in the square
+    * draw_corners: draws the corners of the square
+    * createImg: creates an image of the square, a cutout of the image around the square
+    * add_corners: adds the corners of the square to the square object
+    * is_in_corners: checks if a point is in the corners of the square
+    * which_corner_is_contour_in: finds which corner of square a contour is in
+    * get_rgb_avg_of_contour: gets the average RGB of a contour in the image
+    * get_pins_rgb: gets the average RGB of the pins in the square
+
     """
     def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img = None):
         #self.id = id
         
-        # potential pins
-        self.p_pin_count = 0
+        # potential pins        
         self.p_pins = []
         
         # actual pins
@@ -42,7 +53,7 @@ class Square:
 
         # corners of the square
         self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
-        
+
         # image and image of the square 
         self.img = img.copy()
         self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
@@ -61,6 +72,12 @@ class Square:
         for pin in self.pins:
             cv.drawContours(image, pin, -1, (0, 255, 0), 1)      
     
+    def draw_contours(self, image: MatLike, contours: list[MatLike]):
+        """"""
+        for contour in contours:
+            cv.drawContours(image, contour, -1, (155,0,0))
+        ...
+
     def draw_corners(self, img: MatLike):
         """ Draws the corners of the square """
         for corner in self.corners:
@@ -70,7 +87,7 @@ class Square:
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
-    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p=2, a = 2):
+    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8):
         """ 
         Adds the corners of the square to the square object
         
@@ -90,13 +107,13 @@ class Square:
 
         # Avoiding division by zero
         if self.index[0] != 4:
-            SKEW_x = int((abs(self.index[0] - 4) ** a) * ((self.index[0] - 4)/ abs(self.index[0] - 4)))
+            SKEW_x = int((abs(self.index[0] - 4) ** a  ) * ((self.index[0] - 4)/ abs(self.index[0] - 4))) 
         else:
             SKEW_x = 0
-        
+
         # Avoiding division by zero
         if self.index[1] != 4:
-            SKEW_y = int((abs(self.index[1] - 4) ** a) * ((self.index[1] - 4)/ abs(self.index[1] - 4)))
+            SKEW_y = int((abs(self.index[1] - 4) ** a * 1.2) * ((self.index[1] - 4)/ abs(self.index[1] - 4))) 
         else:
             SKEW_y = 0
 

@@ -1,4 +1,3 @@
-from re import M
 import numpy as np
 import cv2 as cv
 from cv2.typing import MatLike
@@ -35,7 +34,7 @@ def pre_process(scaned_image:MatLike):
 
     # Show the result of the pre-processing.
     """
-    cv.imshow('result', result)
+    cv.imshow('result', edges) #color_mask)
     cv.waitKey(0)
     cv.destroyAllWindows()
     #"""

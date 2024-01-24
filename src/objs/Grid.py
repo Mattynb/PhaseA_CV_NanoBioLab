@@ -2,6 +2,10 @@ import cv2 as cv
 from cv2.typing import MatLike
 from .Square import Square
 
+from math import sqrt 
+import itertools
+import numpy as np
+
 class Grid:
     """
     ### Grid
@@ -131,7 +135,8 @@ class Grid:
         # adds potential pin as a pin to the square if it is.
         for x in self.grid:
             for sq in x:
-                if sq.p_pin_count >= 3:
+                #sq.draw_corners(image_copy)
+                if len(sq.p_pins) >= 3:
                     for p_pin in sq.p_pins:
                         x, y, w, h = cv.boundingRect(p_pin)
                         
@@ -140,7 +145,7 @@ class Grid:
                             
                             sq.add_pin(p_pin)
                             sq.draw_pins(image_copy)
-                            sq.draw_corners(image_copy)
+                            #sq.draw_corners(image_copy)
 
                 
                     
@@ -160,7 +165,7 @@ class Grid:
                     
                     # outputs the rgb sequence of the pins in the block
                     #"""
-                    print(f"Square at index: {sq.index}", "{", sq.get_pins_rgb(), "}\n") 
+                    #print(f"Square at index: {sq.index}", "{", sq.get_pins_rgb(), "}\n") 
                     #"""
 
 
@@ -187,20 +192,51 @@ class Grid:
         # iterate through the contours.
         # if they are around the size of a pin, add them to the corresponding square in the grid.
         for p_pin in contours:
-            x, y, w, h = cv.boundingRect(p_pin) 
+            x, y, w, h = cv.boundingRect(p_pin)
 
+            x_index, y_index = 0, 0
             # checks if the contour is around the size of a pin and adds it to the square if it is
             if  h <= self.PIN_RATIO + (2*self.PLUS_MINUS) and w <= self.PIN_RATIO + (2*self.PLUS_MINUS): 
                 if h > self.PIN_RATIO - (2*self.PLUS_MINUS) and w > self.PIN_RATIO - (2*self.PLUS_MINUS): 
-                
+
                     x_index, y_index = xy_to_index(self, x, y)
 
                     x_index = min(x_index, self.MAX_INDEX)
                     y_index = min(y_index, self.MAX_INDEX)
 
                     self.grid[x_index][y_index].add_p_pin(p_pin)
-                    self.grid[x_index][y_index].p_pin_count += 1
-         
+
+            #print(f"potential pins at [{x_index},{y_index}]: {self.grid[x_index][y_index].p_pin_count} or {len(self.grid[x_index][y_index].p_pins)}") 
+    
+
+
+    def structure_p_pins(self, contours: list[MatLike]):
+        
+        centers = [find_center(c) for c in contours]
+
+
+        centers = [x for x in centers if x != None]  # remove None values
+
+        for combination in itertools.combinations(centers, 4):
+            if self.is_arranged_as_square(combination):
+                print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
+
+
+    # checks if a combination of points are arranged in the shape of a square 
+    def is_arranged_as_square(self, points:list[tuple]):
+        """
+        checks if a combination of points are arranged in the shape of a square
+        ----------
+        points= combination of 4 points (x,y)
+        """
+        # Assuming points is a list of four (x, y) tuples
+        # Calculate distances between each pair of points
+        dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4)]
+        dists.sort()
+        # Check for four sides of equal length and two equal diagonals
+        return np.isclose(dists[0], dists[1], dists[2], dists[3]) and np.isclose(dists[4], dists[5])
+
+    
     # Appends squares to the grid.
     def append(self, x_index:int, y_index:int, square:Square):
         """ 
@@ -246,6 +282,34 @@ class Grid:
 
 #### helper functions ####
         
+# Euclidian Distance
+def distance(p1:float, p2:float):
+    """
+    p1 = (x1,y1)
+    p2 = (x2,y2)
+    """
+    return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
+# Finds center point of contour 
+def find_center(contour: MatLike):   
+    """
+    Finds Center point of a single contour
+    ---------
+    contour: single contour
+
+    """
+    M = cv.moments(contour)  
+
+    # avoiding division by zero
+    if M["m00"] != 0:
+        x = int(M["m10"] / M["m00"])
+        y = int(M["m01"] / M["m00"])
+    
+        return (x, y)
+    else:
+        
+        return None
+
 # Translates the x,y coordinates to the equivalent index of grid_ds.
 def xy_to_index(Grid:Grid , x:int , y:int):
     """
@@ -267,7 +331,23 @@ def xy_to_index(Grid:Grid , x:int , y:int):
 
     return (min(x_index, Grid.MAX_INDEX), min(y_index, Grid.MAX_INDEX))
 
-# Translates the index to the equivalent x,y coordinates of grid_ds tl point.   
+# Same as above but taking into consideration the skewing that happens near the outter squares.
+def xy_to_index_skewed(Grid: Grid, x: int, y: int, a:float):
+
+    middle_index_tl_x = (Grid.SQUARE_LENGTH * Grid.MAX_INDEX)/2
+    middle_index_tl_y = (Grid.SQUARE_LENGTH * Grid.MAX_INDEX)/2
+    
+    index_x, index_y = xy_to_index(Grid, x , y)
+
+    offset_x = int(abs(middle_index_tl_x - index_x)**a)
+    offset_y = int(abs(middle_index_tl_y - index_y)**a)
+
+    index_x_skewed = int(round(x // (Grid.SQUARE_LENGTH + offset_x)))
+    index_y_skewed = int(round(y // (Grid.SQUARE_LENGTH + offset_y)))
+
+    return (min(index_x_skewed, Grid.MAX_INDEX), min(index_y_skewed, Grid.MAX_INDEX))
+
+# Translates the index to the equivalent x,y coordinates of grid_ds top left point.   
 def index_to_xy(Grid:Grid, x_index:int, y_index:int):
     """
     ### Index to XY
