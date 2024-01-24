@@ -87,7 +87,7 @@ class Square:
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
-    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8):
+    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =2, a:float = 1.8):
         """ 
         Adds the corners of the square to the square object
         

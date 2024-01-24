@@ -136,7 +136,7 @@ class Grid:
         for x in self.grid:
             for sq in x:
                 #sq.draw_corners(image_copy)
-                if len(sq.p_pins) >= 3:
+                if len(sq.p_pins) >= 2:
                     for p_pin in sq.p_pins:
                         x, y, w, h = cv.boundingRect(p_pin)
                         
@@ -145,8 +145,12 @@ class Grid:
                             
                             sq.add_pin(p_pin)
                             sq.draw_pins(image_copy)
-                            #sq.draw_corners(image_copy)
-
+                            self.show_gridLines(image_copy)
+                            sq.draw_corners(image_copy)
+        
+        cv.imshow('block', image_copy)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
                 
                     
         # checks if the square has 2 or more pins and if it does, it is considered a block.
@@ -170,7 +174,7 @@ class Grid:
 
 
         # shows image with pins and corners drawn
-        #'''
+        '''
         self.show_gridLines()
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
@@ -187,6 +191,21 @@ class Grid:
         #### Args:
         * contours: list of contours around non-grayscale (colorful) edges in image
         """
+
+        square_structures = self.square_structures(contours)
+        print(square_structures)
+
+        for square_structure in square_structures:
+            center = find_center_of_points(square_structure)
+            x_index, y_index = xy_to_index(self, center[0], center[1])
+
+            for p_pins in square_structure:
+
+                # check curvature
+                # add to square at index
+                ...
+
+            
 
 
         # iterate through the contours.
@@ -210,17 +229,27 @@ class Grid:
     
 
 
-    def structure_p_pins(self, contours: list[MatLike]):
+    def square_structures(self, contours: list[MatLike]):
         
-        centers = [find_center(c) for c in contours]
+        square_structures = []
 
-
+        centers = [find_center_of_contour(c) for c in contours]
         centers = [x for x in centers if x != None]  # remove None values
+
+        height, width, _ = self.img.shape
+        blank_image = np.zeros((height,width,3), np.uint8)
 
         for combination in itertools.combinations(centers, 4):
             if self.is_arranged_as_square(combination):
-                print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
+        
+                square_structures.append(list(combination))
 
+                #print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
+
+                cv.rectangle(blank_image, combination[0], combination[3], (0, 255, 0), 1)
+                cv.imshow('blank', blank_image)
+
+        return square_structures
 
     # checks if a combination of points are arranged in the shape of a square 
     def is_arranged_as_square(self, points:list[tuple]):
@@ -256,14 +285,12 @@ class Grid:
         self.grid[x_index][y_index] = square
 
     # Shows the grid lines on the image.
-    def show_gridLines(self):
+    def show_gridLines(self, img: MatLike):
         """
         ### Show grid lines
         ---------------
         Function that shows the grid lines on the image.
         """
-        
-        img = self.img.copy()
         
         # draw grid lines
         for i in range(0 + self.EDGE_RATIO, self.MAX_XY - self.EDGE_RATIO,  self.SQUARE_RATIO + self.EDGE_RATIO):
@@ -291,7 +318,7 @@ def distance(p1:float, p2:float):
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 # Finds center point of contour 
-def find_center(contour: MatLike):   
+def find_center_of_contour(contour: MatLike):   
     """
     Finds Center point of a single contour
     ---------
@@ -309,6 +336,23 @@ def find_center(contour: MatLike):
     else:
         
         return None
+
+# Finds center point of points
+def find_center_of_points(points: list[tuple]):
+    """
+    Finds Center point of a list of points
+    ---------
+    points: list of points
+
+    """
+    x = 0
+    y = 0
+
+    for point in points:
+        x += point[0]
+        y += point[1]
+
+    return (x//len(points), y//len(points))
 
 # Translates the x,y coordinates to the equivalent index of grid_ds.
 def xy_to_index(Grid:Grid , x:int , y:int):

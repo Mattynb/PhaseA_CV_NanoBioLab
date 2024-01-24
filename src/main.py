@@ -35,14 +35,14 @@ def main(path_to_imgs):
 
         # creating a grid object with the scanned image
         Grid_DS = Grid(Image_i.img_scan); #Grid_DS.show_gridLines()
-        
+
 
         # finds the contours around non-grayscale (colorful) edges in image
-        contours = pre_process(Image_i.img_scan)  
+        contours = pre_process(Image_i.img_scan)
 
 
         # determines what squares in grid are blocks
-        Grid_DS.find_blocks(contours)             
+        Grid_DS.find_blocks(contours)
 
 
         # identifies type of blocks in the grid
@@ -50,11 +50,11 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    #path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_wit_block_A_B\IMG_5190.jpeg"    #IMG_5020.JPEG
-    #main(path_to_imgs)
+    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_wit_block_A_B\IMG_5190.jpeg"    #IMG_5020.JPEG
+    main(path_to_imgs)
 
-    path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 
-    main(path_new)
+    #path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 
+    #main(path_new)
     
     
 
@@ -64,20 +64,18 @@ if __name__ == '__main__':
 """
 
 TODO: 
-Structure of contours
+Structure of contours. add contours to index where its Moment (middle of structure) is located.
 
 TODO: 
 Understand why the bottom block is not recognized as a block in the image IMG_5190.JPEG
-Corner might be going up. Make it only encompass the pins.
+Reason: bottom pins are being indexed in the bottom square.
 
 TODO: 
-add curvature check when checking for pin size.
+add curvature check when checking for pin size. unless theyre in the boundaries of image (not sure if this is necessary)
+
 
 TODO: 
 Image normalization HSV?
-
-TODO: 
-Checking pins with shape, unless theyre in the boundaries of image (not sure if this is necessary)
 
 TODO: 
 image generation with blocks for U-NET (find out what that is)
