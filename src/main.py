@@ -63,14 +63,14 @@ if __name__ == '__main__':
 
 """
 
-TODO: 
+DONE: 
 Structure of contours. add contours to index where its Moment (middle of structure) is located.
 
-TODO: 
+DONE: 
 Understand why the bottom block is not recognized as a block in the image IMG_5190.JPEG
 Reason: bottom pins are being indexed in the bottom square.
 
-TODO: 
+DONE: 
 add curvature check when checking for pin size. unless theyre in the boundaries of image (not sure if this is necessary)
 
 

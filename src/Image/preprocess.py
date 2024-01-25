@@ -2,6 +2,34 @@ import numpy as np
 import cv2 as cv
 from cv2.typing import MatLike
 
+
+def _pre_process(scaned_image:MatLike):
+    # Convert to grayscale
+    gray = cv.cvtColor(scaned_image, cv.COLOR_BGR2GRAY)
+
+    # Blur the image to reduce noise
+    gray_blurred = cv.medianBlur(gray, 5)
+
+    # Apply Hough Circle Transform
+    circles = cv.HoughCircles(gray_blurred, cv.HOUGH_GRADIENT, 1, 20,
+                            param1=30, param2=50, minRadius=0, maxRadius=0)
+
+    # Ensure at least some circles were found
+    if circles is not None:
+        # Convert the (x, y) coordinates and radius of the circles to integers
+        circles = np.round(circles[0, :]).astype("int")
+
+        # Loop over the (x, y) coordinates and radius of the circles
+        for (x, y, r) in circles:
+            # Draw the circle in the output image
+            cv.circle(scaned_image, (x, y), r, (0, 255, 0), 4)
+
+    # Display the result
+    cv.imshow('Detected Circles', scaned_image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+
 # A function that pre-processes the image to isolate the color of the pins.
 def pre_process(scaned_image:MatLike):
     """

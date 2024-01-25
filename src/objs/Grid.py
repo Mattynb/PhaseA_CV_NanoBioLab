@@ -1,3 +1,4 @@
+from calendar import c
 import cv2 as cv
 from cv2.typing import MatLike
 from .Square import Square
@@ -192,22 +193,37 @@ class Grid:
         * contours: list of contours around non-grayscale (colorful) edges in image
         """
 
-        square_structures = self.square_structures(contours)
-        print(square_structures)
+        square_structures, p_pins  = self.square_structures(contours)
 
+
+        # indexes around the perimeter of grid
+        top_row    = [(x, 0) for x in range(self.MAX_INDEX + 1)]
+        bottom_row = [(self.MAX_INDEX, x) for x in range(self.MAX_INDEX + 1)]
+        left_col   = [(0, y) for y in range(self.MAX_INDEX + 1)]
+        right_col  = [(self.MAX_INDEX, y) for y in range(self.MAX_INDEX + 1)] 
+        perimeter_indexes = [] + top_row + bottom_row + left_col + right_col
+
+
+
+        # adds the 4 potential pins structured as a square shape to the square in the grid where the middle of the structure is located
         for square_structure in square_structures:
+
+            # middle of the structure 
             center = find_center_of_points(square_structure)
             x_index, y_index = xy_to_index(self, center[0], center[1])
 
-            for p_pins in square_structure:
+            # p_pin contours in p_pins
+            for combin in p_pins:
+                for p_pin in combin:
+                    # check curvature
+                    if contour_is_circular(p_pin) or (x_index, y_index) in perimeter_indexes:
 
-                # check curvature
-                # add to square at index
-                ...
-
-            
+                        #print(f"\n p_pin: {len(p_pins)}x{len(p_pin[0])}x{len(p_pin[0][0])}  = {p_pin[0]}\n")
+                        # add 4 pins to square
+                        self.grid[x_index][y_index].add_p_pin(p_pin)
 
 
+    """
         # iterate through the contours.
         # if they are around the size of a pin, add them to the corresponding square in the grid.
         for p_pin in contours:
@@ -226,30 +242,42 @@ class Grid:
                     self.grid[x_index][y_index].add_p_pin(p_pin)
 
             #print(f"potential pins at [{x_index},{y_index}]: {self.grid[x_index][y_index].p_pin_count} or {len(self.grid[x_index][y_index].p_pins)}") 
-    
+    """
 
 
     def square_structures(self, contours: list[MatLike]):
         
         square_structures = []
+        p_pins = []
 
-        centers = [find_center_of_contour(c) for c in contours]
+        center_to_contour_index = {}
+        for i, contour in enumerate(contours):
+            center = find_center_of_contour(contour)
+            if center is not None:
+                center_to_contour_index[center] = i
+
+        centers = list(center_to_contour_index.keys())
         centers = [x for x in centers if x != None]  # remove None values
 
         height, width, _ = self.img.shape
         blank_image = np.zeros((height,width,3), np.uint8)
 
-        for combination in itertools.combinations(centers, 4):
-            if self.is_arranged_as_square(combination):
+        combinations = list(itertools.combinations(centers, 4))
+        for comb in combinations:
+            if self.is_arranged_as_square(comb):
         
-                square_structures.append(list(combination))
-
+                square_structures.append(list(comb))
                 #print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
 
-                cv.rectangle(blank_image, combination[0], combination[3], (0, 255, 0), 1)
+                # Find the indices of the contours that form the square
+                contour_indices = [center_to_contour_index[point] for point in comb]
+                p_pins.append([contours[i] for i in contour_indices])
+
+
+                cv.rectangle(blank_image, comb[0], comb[3], (0, 255, 0), 1)
                 cv.imshow('blank', blank_image)
 
-        return square_structures
+        return square_structures, p_pins
 
     # checks if a combination of points are arranged in the shape of a square 
     def is_arranged_as_square(self, points:list[tuple]):
@@ -258,12 +286,13 @@ class Grid:
         ----------
         points= combination of 4 points (x,y)
         """
+        
         # Assuming points is a list of four (x, y) tuples
         # Calculate distances between each pair of points
         dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4)]
         dists.sort()
         # Check for four sides of equal length and two equal diagonals
-        return np.isclose(dists[0], dists[1], dists[2], dists[3]) and np.isclose(dists[4], dists[5])
+        return np.isclose(dists[0], dists[1], atol=0.05, rtol=0.05) and np.isclose(dists[1], dists[2], atol=0.05, rtol=0.05) and np.isclose(dists[2], dists[3], atol=0.05, rtol=0.05) and np.isclose(dists[4], dists[5], atol=0.05, rtol=0.05)
 
     
     # Appends squares to the grid.
@@ -309,6 +338,49 @@ class Grid:
 
 #### helper functions ####
         
+def contour_is_circular(contour: MatLike):
+    """
+    ### Contour is circular
+    ---------------
+    Function that checks if a contour is circular.
+    
+    #### Args:
+    * contour: Contour of the object in the image.
+    """
+
+    # Approximate the contour
+    perimeter = cv.arcLength(contour, True)
+    area = cv.contourArea(contour)
+    circularity = 4 * np.pi * (area / (perimeter ** 2))
+
+    # Check the circularity
+    check_1 = False
+    if 0.6 < circularity < 1.4:
+        # This contour is close to a circle
+        check_1 = True
+
+    # Fit a bounding rectangle and check the aspect ratio
+    x, y, w, h = cv.boundingRect(contour)
+    aspect_ratio = float(w) / h
+    check_2 = False
+    if 0.6 < aspect_ratio < 1.4:
+        # The contour is close to being contained in a square
+        check_2 = True
+
+    # Minimum enclosing circle
+    (x, y), radius = cv.minEnclosingCircle(contour)
+    circle_area = np.pi * (radius ** 2)
+    check_3 = False
+    if 0.6 < (area / circle_area) < 1.4:
+        # The area of the contour is close to that of the enclosing circle
+        check_3 = True
+    
+    if check_1 and check_2 and check_3:
+        return True
+
+    return False
+
+
 # Euclidian Distance
 def distance(p1:float, p2:float):
     """
