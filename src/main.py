@@ -63,25 +63,14 @@ if __name__ == '__main__':
 
 """
 
-DONE: 
-Structure of contours. add contours to index where its Moment (middle of structure) is located.
-
-DONE: 
-Understand why the bottom block is not recognized as a block in the image IMG_5190.JPEG
-Reason: bottom pins are being indexed in the bottom square.
-
-DONE: 
-add curvature check when checking for pin size. unless theyre in the boundaries of image (not sure if this is necessary)
-
-
-TODO: 
+TODO:
 Image normalization HSV?
+
+TODO:
+"database" of block ids 
 
 TODO: 
 image generation with blocks for U-NET (find out what that is)
-
-
-
 
 TODO: 
 Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.

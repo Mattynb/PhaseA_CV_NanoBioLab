@@ -71,7 +71,6 @@ class Grid:
         # First we initialize 2D array grid_ds with None values. 
         grid = [[None for _ in range(self.MAX_INDEX + 1)] for _ in range(self.MAX_INDEX + 1)]
 
-
         # Next we will replace the None values with Square objects. 
         
         # These are the stop values for the for loops.
@@ -149,16 +148,17 @@ class Grid:
                             self.show_gridLines(image_copy)
                             sq.draw_corners(image_copy)
         
+        """
         cv.imshow('block', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
-                
+        """
                     
-        # checks if the square has 2 or more pins and if it does, it is considered a block.
+        # checks if the square has x or more pins and if it does, it is considered a block.
         blocks_found = 0
         for x in self.grid:
             for sq in x:
-                if len(sq.pins) >= 2:
+                if len(sq.pins) >= 4:
                     sq.is_block = True
                     blocks_found += 1
 
@@ -169,14 +169,15 @@ class Grid:
                     #"""
                     
                     # outputs the rgb sequence of the pins in the block
-                    #"""
+                    # return ...
+                    
                     #print(f"Square at index: {sq.index}", "{", sq.get_pins_rgb(), "}\n") 
                     #"""
 
 
         # shows image with pins and corners drawn
-        '''
-        self.show_gridLines()
+        #'''
+        self.show_gridLines(image_copy)
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -193,8 +194,8 @@ class Grid:
         * contours: list of contours around non-grayscale (colorful) edges in image
         """
 
+        # Square structures are 4 points (in this case potential pins) arranged in the shape of a square
         square_structures, p_pins  = self.square_structures(contours)
-
 
         # indexes around the perimeter of grid
         top_row    = [(x, 0) for x in range(self.MAX_INDEX + 1)]
@@ -202,8 +203,6 @@ class Grid:
         left_col   = [(0, y) for y in range(self.MAX_INDEX + 1)]
         right_col  = [(self.MAX_INDEX, y) for y in range(self.MAX_INDEX + 1)] 
         perimeter_indexes = [] + top_row + bottom_row + left_col + right_col
-
-
 
         # adds the 4 potential pins structured as a square shape to the square in the grid where the middle of the structure is located
         for square_structure in square_structures:
@@ -223,50 +222,46 @@ class Grid:
                         self.grid[x_index][y_index].add_p_pin(p_pin)
 
 
-    """
-        # iterate through the contours.
-        # if they are around the size of a pin, add them to the corresponding square in the grid.
-        for p_pin in contours:
-            x, y, w, h = cv.boundingRect(p_pin)
-
-            x_index, y_index = 0, 0
-            # checks if the contour is around the size of a pin and adds it to the square if it is
-            if  h <= self.PIN_RATIO + (2*self.PLUS_MINUS) and w <= self.PIN_RATIO + (2*self.PLUS_MINUS): 
-                if h > self.PIN_RATIO - (2*self.PLUS_MINUS) and w > self.PIN_RATIO - (2*self.PLUS_MINUS): 
-
-                    x_index, y_index = xy_to_index(self, x, y)
-
-                    x_index = min(x_index, self.MAX_INDEX)
-                    y_index = min(y_index, self.MAX_INDEX)
-
-                    self.grid[x_index][y_index].add_p_pin(p_pin)
-
-            #print(f"potential pins at [{x_index},{y_index}]: {self.grid[x_index][y_index].p_pin_count} or {len(self.grid[x_index][y_index].p_pins)}") 
-    """
-
-
     def square_structures(self, contours: list[MatLike]):
-        
+        """
+        ### Square structures
+        ---------------
+        Function that finds the square structures in the image.  
+        A square structure is defined as 4 points (in this case potential pins) arranged in the shape of a square.
+
+        #### Args:
+        * contours: list of contours around non-grayscale (colorful) edges in image
+
+        #### Returns:
+        * square_structures: list of square structures
+        * p_pins: list of p_pins
+        """
         square_structures = []
         p_pins = []
 
+        # Find the center point of each contour
         center_to_contour_index = {}
         for i, contour in enumerate(contours):
             center = find_center_of_contour(contour)
             if center is not None:
                 center_to_contour_index[center] = i
 
-        centers = list(center_to_contour_index.keys())
-        centers = [x for x in centers if x != None]  # remove None values
+        # save the indexes bounding the centers of the contours in a list and remove None values
+        centers = list(center_to_contour_index.keys()) 
+        centers = [x for x in centers if x != None]
 
+        # Create a blank image to draw the squares on, for visual confirmation.
         height, width, _ = self.img.shape
         blank_image = np.zeros((height,width,3), np.uint8)
 
+        # Find all combinations of four points       
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
             if self.is_arranged_as_square(comb):
-        
+                
+                # Add the square to the list of combinations if it is arranged as a square
                 square_structures.append(list(comb))
+                
                 #print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
 
                 # Find the indices of the contours that form the square
@@ -291,9 +286,14 @@ class Grid:
         # Calculate distances between each pair of points
         dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4)]
         dists.sort()
-        # Check for four sides of equal length and two equal diagonals
-        return np.isclose(dists[0], dists[1], atol=0.05, rtol=0.05) and np.isclose(dists[1], dists[2], atol=0.05, rtol=0.05) and np.isclose(dists[2], dists[3], atol=0.05, rtol=0.05) and np.isclose(dists[4], dists[5], atol=0.05, rtol=0.05)
 
+        # Check for four sides of equal length and two equal diagonals
+        return (
+            np.isclose(dists[0], dists[1], atol=0.05, rtol=0.05) 
+            and np.isclose(dists[1], dists[2], atol=0.05, rtol=0.05) 
+            and np.isclose(dists[2], dists[3], atol=0.05, rtol=0.05) 
+            and np.isclose(dists[4], dists[5], atol=0.05, rtol=0.05)
+        )
     
     # Appends squares to the grid.
     def append(self, x_index:int, y_index:int, square:Square):
@@ -330,7 +330,7 @@ class Grid:
                 cv.line(img, (0, i), (self.MAX_XY, i), (0, 255, 0), 1)
                 cv.line(img, (0, i + self.SQUARE_RATIO), (self.MAX_XY, i + self.SQUARE_RATIO), (0, 255, 0), 1)
 
-        cv.imshow('grid', img)
+        #cv.imshow('grid', img)
         #cv.waitKey(0)
         #cv.destroyAllWindows()
 
