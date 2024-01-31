@@ -50,7 +50,7 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
+    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\Grid with block types- 01302024\IMG_5362.JPEG" #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
     main(path_to_imgs)
 
     #path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 

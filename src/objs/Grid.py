@@ -53,6 +53,9 @@ class Grid:
 
         # represents the grid in the image as a 2D array of squares
         self.grid = self.create_grid()
+
+        # list of blocks in the grid
+        self.blocks = []
     
     # Creates a "map" (list of lists) of squares in the grid.
     def create_grid(self):
@@ -155,12 +158,11 @@ class Grid:
         """
                     
         # checks if the square has x or more pins and if it does, it is considered a block.
-        blocks_found = 0
         for x in self.grid:
             for sq in x:
                 if len(sq.pins) >= 4:
                     sq.is_block = True
-                    blocks_found += 1
+                    self.blocks.append(sq)
 
                     """
                     cv.imshow('block', sq.img)

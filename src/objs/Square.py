@@ -46,6 +46,7 @@ class Square:
         # block or not and type of block
         self.is_block = False
         self.block_type = ''
+        self.raw_sequnece = [] #RBG values of the pins in the square (tl, tr, bl, br)
 
         # coordinates and index in Grid
         self.tl = tl; self.br = br
@@ -277,3 +278,29 @@ class Square:
             pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner, pf))
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
+
+    def get_raw_sequence(self):
+        """
+        ### Get raw sequence
+        ---------------
+        Function that gets the raw sequence of the square.
+        
+        #### Returns:
+        * raw_sequence: Raw sequence of the square.
+        """
+
+        """ NOT IMPLEMENTED YET """
+
+        # get the RGB values of the pins in the square
+        pins_rgb, _ = self.get_pins_rgb(0)
+
+        # fixing the order from tr,tl,br,bl to clockwise starting from top-right
+        for rgb in pins_rgb:
+            try:
+                br = rgb[2]
+                rgb[2] = rgb[3]
+                rgb[3] = br
+            except:
+                pass
+
+        return pins_rgb
