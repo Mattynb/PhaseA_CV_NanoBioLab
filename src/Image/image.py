@@ -36,6 +36,8 @@ class Image:
         w, h = self.img_resized.shape[:2] 
         self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
 
+        cv.imwrite(f"img_{self.id}_scan.jpg", self.img_scan)
+
         #self.show_steps()
 
     def resize_2_std(self, img: MatLike, factor: float, w:int=None, h:int = None):

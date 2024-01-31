@@ -4,3 +4,4 @@ src/__pycache__/*
 src/Image/__pycache__/image_class.cpython-311.pyc
 src/Image/__pycache__/image_scanner.cpython-311.pyc
 src/scratch.py
+src/secrets_.py

@@ -50,7 +50,7 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_wit_block_A_B\IMG_5190.jpeg"    #IMG_5020.JPEG
+    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
     main(path_to_imgs)
 
     #path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 
@@ -62,17 +62,15 @@ if __name__ == '__main__':
 
 
 """
+TODO:
+"database" of block ids 
 
 TODO:
 Image normalization HSV?
-
-TODO:
-"database" of block ids 
 
 TODO: 
 image generation with blocks for U-NET (find out what that is)
 
 TODO: 
 Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.
-
 """
