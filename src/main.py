@@ -1,7 +1,7 @@
 from image import Image, image_loader, pre_process
 from objs import Grid
 
-from backend import identify_blocks
+from backend import identify_block
 
 def main(path_to_imgs):
     """
@@ -46,7 +46,9 @@ def main(path_to_imgs):
 
 
         # identifies type of blocks in the grid
-        #identify_blocks(Grid_DS)
+        for block in Grid_DS.blocks:
+            block.get_raw_sequence()
+            identify_block(block)
         
 
 if __name__ == '__main__':

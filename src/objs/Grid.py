@@ -161,6 +161,7 @@ class Grid:
             for sq in x:
                 if len(sq.pins) >= 4:
                     sq.is_block = True
+                    sq.img = self.img
                     self.blocks.append(sq)
 
                     """

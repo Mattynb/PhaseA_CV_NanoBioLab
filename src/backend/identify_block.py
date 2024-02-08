@@ -1,4 +1,4 @@
-from connect_to_db import connect_to_mongo
+from .connect_to_db import connect_to_mongo
 
 def identify_block(block):
 
@@ -34,7 +34,7 @@ def rgb_to_number(rgb, collection):
 
     for number in numbers:
         print(number['color_name'])    
-        print(f"r: {r}, g: {g}, b: {b}\n")
+        #print(f"r: {r}, g: {g}, b: {b}\n")
 
     return numbers
 

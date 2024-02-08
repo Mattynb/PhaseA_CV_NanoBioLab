@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from secrets_ import URI
+from .secrets_ import URI
 
 
 

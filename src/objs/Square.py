@@ -46,17 +46,17 @@ class Square:
         # block or not and type of block
         self.is_block = False
         self.block_type = ''
-        self.raw_sequnece = [] #RBG values of the pins in the square (tl, tr, bl, br)
+        self.raw_sequence = [] #RBG values of the pins in the square (tl, tr, bl, br)
 
         # coordinates and index in Grid
         self.tl = tl; self.br = br
         self.index = index
 
         # corners of the square
-        #self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
+        self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
 
         # image and image of the square 
-        #self.img = img.copy()
+        self.img = img.copy() if img is not None else None
         #self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
 
 
@@ -197,7 +197,7 @@ class Square:
         ---------------
         Function that finds which corner of square a contour is in.
         """
-        # corn = ["top_right", "top_left", "bottom_right", "bottom_left" ]
+        corn = ["top_left", "top_right", "bottom_left", "bottom_right" ]
 
         x, y = cv.boundingRect(contour)[:2]
 
@@ -205,7 +205,7 @@ class Square:
         for corner in self.corners:
             if x >= corner[0][0] and x <= corner[1][0]:
                 if y >= corner[0][1] and y <= corner[1][1]:
-                    return corner
+                    return corn[i]
             i += 1
 
 
@@ -214,14 +214,14 @@ class Square:
         for corner in self.corners:
             if x + 5 >= corner[0][0] and x + 5 <= corner[1][0]:
                 if y+ 5  >= corner[0][1] and y+ 5  <= corner[1][1]:
-                    return corner
+                    return corn[i]
             i += 1
         
         i =0
         for corner in self.corners:
             if x-5 >= corner[0][0] and x-5 <= corner[1][0]:
                 if y-5  >= corner[0][1] and y-5 <= corner[1][1]:
-                    return corner
+                    return corn[i]
             i += 1
 
 
@@ -271,10 +271,11 @@ class Square:
         * pf: print flag. Flag to print the RGB values of the pins.
         """
         pins_rgb = []
+        corner = []
 
         # for each pin in the square get the average RGB value of the pin and its corner
         for pins in self.pins:
-            corner = self.which_corner_is_contour_in(pins)
+            corner.append(self.which_corner_is_contour_in(pins))
             pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner, pf))
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
@@ -288,19 +289,12 @@ class Square:
         #### Returns:
         * raw_sequence: Raw sequence of the square.
         """
-
-        """ NOT IMPLEMENTED YET """
+      
 
         # get the RGB values of the pins in the square
-        pins_rgb, _ = self.get_pins_rgb(0)
+        pins_rgb, corner_key = self.get_pins_rgb(0)
 
-        # fixing the order from tr,tl,br,bl to clockwise starting from top-right
-        for rgb in pins_rgb:
-            try:
-                br = rgb[2]
-                rgb[2] = rgb[3]
-                rgb[3] = br
-            except:
-                pass
+        print(corner_key)
 
-        return pins_rgb
+        # fixing the order from tr,tl,br,bl to clockwise starting from top-right. This might be the ugliest code I've ever written. But it works!
+        return [pins_rgb[corner_key.index(key)] for key in ["top_right", "top_left", "bottom_left", "bottom_right"]]

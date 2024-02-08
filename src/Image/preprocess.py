@@ -61,7 +61,7 @@ def pre_process(scaned_image:MatLike):
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
     # Show the result of the pre-processing.
-    """
+    #"""
     cv.imshow('result', edges) #color_mask)
     cv.waitKey(0)
     cv.destroyAllWindows()
