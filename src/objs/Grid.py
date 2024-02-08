@@ -1,4 +1,3 @@
-from calendar import c
 import cv2 as cv
 from cv2.typing import MatLike
 from .Square import Square

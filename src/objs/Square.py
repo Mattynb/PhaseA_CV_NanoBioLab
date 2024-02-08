@@ -53,11 +53,11 @@ class Square:
         self.index = index
 
         # corners of the square
-        self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
+        #self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
 
         # image and image of the square 
-        self.img = img.copy()
-        self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
+        #self.img = img.copy()
+        #self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
 
 
     def add_p_pin(self, p_pin: MatLike):

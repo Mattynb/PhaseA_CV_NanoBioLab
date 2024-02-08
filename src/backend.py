@@ -1,26 +1,30 @@
 
-
-
-
 def identify_blocks(Grid):
     """
     ### Identify blocks
     ------------------
-    Function that identifies the blocks of the grid and encodes them.
+    Function that identifies the type of blocks based on their sequence of pin colors.
 
     #### Args:
     grid: grid object
     """
 
-    for blocks in Grid.blocks:
-        rgbs, _ = sq.get_pins_rgb(0)
+    for block in Grid.blocks:
+        rgbs, _ = block.get_pins_rgb(0)
 
-        # fixing the order from tr,tl,br,bl to clockwise starting from top-right
+        # fixing the order from tr,tl,br,bl to tl, tr, bl, br
         for rgb in rgbs:
             try:
+                # swap br and bl
                 br = rgb[2]
                 rgb[2] = rgb[3]
                 rgb[3] = br
+
+                # swap tr and tl
+                tr = rgb[0]
+                rgb[0] = rgb[1]
+                rgb[1] = tr
+
             except:
                 pass
 
@@ -32,19 +36,6 @@ def identify_blocks(Grid):
             sequence.append(identify_pin(pin))
         
         print(sequence)
-    
 
-
-def identify_pin(pin):
-    excel = pd.read_excel(r"quartiles.xlsx")    
-
-    for color in excel.values:
-        # color = [r,g,b, color_name]
-
-        # if the pin is the same color as the color in the excel file
-        if pin[0] in range(color[1], color[4]):
-            if pin[1] in range(color[2], color[5]):
-                if pin[2] in range(color[3], color[6]):
-                    return color[0]
 
 

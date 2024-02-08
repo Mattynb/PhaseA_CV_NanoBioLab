@@ -1,18 +1,16 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from secrets_ import MONGO_PASSWORD
+from secrets_ import URI
 
 
 
 def connect_to_mongo():
     """
     Connect to MongoDB Atlas and return the client object.
-    """
-    
-    atlas_connection_uri = f"mongodb+srv://matheusberbet001:{MONGO_PASSWORD}@amplicluster.0k26okc.mongodb.net/?retryWrites=true&w=majority"
+    """    
 
     # Connect to your Atlas cluster
-    client = MongoClient(atlas_connection_uri, server_api=ServerApi('1'))
+    client = MongoClient(URI, server_api=ServerApi('1'))
 
     # Send a ping to confirm a successful connection
     try:
