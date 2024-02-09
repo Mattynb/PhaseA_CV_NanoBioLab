@@ -24,7 +24,7 @@ def main(path_to_imgs):
     for img in original_images:
         try:
             # Create Image object from loaded image
-            Image_i = Image(id, img, 0.5); print(f"Image {id} loaded")
+            Image_i = Image(id, img, 0.3); print(f"Image {id} loaded")
             id += 1
 
         except AttributeError:
@@ -44,7 +44,7 @@ def main(path_to_imgs):
         # determines what squares in grid are blocks
         Grid_DS.find_blocks(contours)
 
-
+        print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
         # identifies type of blocks in the grid
         for block in Grid_DS.blocks:
             block.get_raw_sequence()
@@ -52,7 +52,7 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\Grid with block types- 01302024\IMG_5362.JPEG" #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
+    path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\Grid with block types- 01302024\IMG_5364.JPEG" #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
     main(path_to_imgs)
 
     #path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 

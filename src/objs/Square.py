@@ -88,7 +88,7 @@ class Square:
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
-    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =2, a:float = 1.8):
+    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8):
         """ 
         Adds the corners of the square to the square object
         
@@ -114,7 +114,7 @@ class Square:
 
         # Avoiding division by zero
         if self.index[1] != 4:
-            SKEW_y = int((abs(self.index[1] - 4) ** a * 1.2) * ((self.index[1] - 4)/ abs(self.index[1] - 4))) 
+            SKEW_y = int((abs(self.index[1] - 4) ** a  ) * ((self.index[1] - 4)/ abs(self.index[1] - 4))) 
         else:
             SKEW_y = 0
 
@@ -212,18 +212,10 @@ class Square:
         # might be unecessary after corner skewing
         i =0
         for corner in self.corners:
-            if x + 5 >= corner[0][0] and x + 5 <= corner[1][0]:
-                if y+ 5  >= corner[0][1] and y+ 5  <= corner[1][1]:
+            if x + 5 >= corner[0][0] and x - 5 <= corner[1][0]:
+                if y + 5  >= corner[0][1] and y - 5  <= corner[1][1]:
                     return corn[i]
             i += 1
-        
-        i =0
-        for corner in self.corners:
-            if x-5 >= corner[0][0] and x-5 <= corner[1][0]:
-                if y-5  >= corner[0][1] and y-5 <= corner[1][1]:
-                    return corn[i]
-            i += 1
-
 
 
     def get_rgb_avg_of_contour(self, contour:MatLike, corner:list[MatLike]='', print_flag:int = 1):
@@ -270,6 +262,7 @@ class Square:
         #### Args:
         * pf: print flag. Flag to print the RGB values of the pins.
         """
+
         pins_rgb = []
         corner = []
 
@@ -294,7 +287,15 @@ class Square:
         # get the RGB values of the pins in the square
         pins_rgb, corner_key = self.get_pins_rgb(0)
 
-        print(corner_key)
-
+        
         # fixing the order from tr,tl,br,bl to clockwise starting from top-right. This might be the ugliest code I've ever written. But it works!
-        return [pins_rgb[corner_key.index(key)] for key in ["top_right", "top_left", "bottom_left", "bottom_right"]]
+        sequence = []
+
+        for key in ["top_left", "top_right", "bottom_left", "bottom_right"]:
+            try: 
+                sequence.append(pins_rgb[corner_key.index(key)]) 
+            except:
+                sequence.append((0,0,0))
+
+
+        self.raw_sequence = sequence

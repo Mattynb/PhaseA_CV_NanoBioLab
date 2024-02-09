@@ -159,6 +159,8 @@ class Grid:
         # checks if the square has x or more pins and if it does, it is considered a block.
         for x in self.grid:
             for sq in x:
+                if len(sq.pins) > 0:
+                    print(f"len(sq.pins): {len(sq.pins)}")
                 if len(sq.pins) >= 4:
                     sq.is_block = True
                     sq.img = self.img
@@ -179,11 +181,12 @@ class Grid:
 
         # shows image with pins and corners drawn
         #'''
-        self.show_gridLines(image_copy)
+        #self.show_gridLines(image_copy)
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
         #'''
+        #cv.destroyAllWindows()
 
     
     def find_p_pins(self, contours: list[MatLike]):
@@ -270,10 +273,11 @@ class Grid:
                 contour_indices = [center_to_contour_index[point] for point in comb]
                 p_pins.append([contours[i] for i in contour_indices])
 
-
+                #"""
                 cv.rectangle(blank_image, comb[0], comb[3], (0, 255, 0), 1)
                 cv.imshow('blank', blank_image)
-
+                #""""
+                
         return square_structures, p_pins
 
     # checks if a combination of points are arranged in the shape of a square 

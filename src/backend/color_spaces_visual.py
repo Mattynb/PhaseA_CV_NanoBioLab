@@ -11,59 +11,11 @@ original_ranges = {
 
 # Adjusted color ranges
 adjusted_ranges = {
-    "Red": {"min": (122, 13, 34), "max": (208, 100, 130)},
-    "Blue": {"min": (7, 19, 139), "max": (100, 130, 242)},
-    "Green": {"min": (80, 117, 54), "max": (140, 181, 120)},
-    "Purple": {"min": (100, 30, 143), "max": (160, 100, 206)}
+    "Red": {"min": (122, 13, 34), "max": (208, 115, 130)},
+    "Blue": {"min": (7, 19, 130), "max": (100, 130, 242)},
+    "Green": {"min": (80, 115, 54), "max": (140, 181, 130)},
+    "Purple": {"min": (100, 30, 130), "max": (160, 115, 206)}
 }
-
-fig = plt.figure(figsize=(14, 7))
-
-# Plot for original ranges
-ax1 = fig.add_subplot(121, projection='3d')
-ax1.set_title('Original Color Ranges')
-ax1.set_xlabel('R')
-ax1.set_ylabel('G')
-ax1.set_zlabel('B')
-
-# Plot for adjusted ranges
-ax2 = fig.add_subplot(122, projection='3d')
-ax2.set_title('Adjusted Color Ranges')
-ax2.set_xlabel('R')
-ax2.set_ylabel('G')
-ax2.set_zlabel('B')
-
-# Helper function to plot ranges
-def plot_ranges(ax, ranges, colors):
-    for color, range in ranges.items():
-        min_corner = range['min']
-        max_corner = range['max']
-        
-        # Generate corners of the rectangle
-        corners = [
-            [min_corner[0], min_corner[1], min_corner[2]],  # Min corner
-            [min_corner[0], min_corner[1], max_corner[2]],  # Min, min, max
-            [min_corner[0], max_corner[1], min_corner[2]],  # Min, max, min
-            [min_corner[0], max_corner[1], max_corner[2]],  # Min, max, max
-            [max_corner[0], min_corner[1], min_corner[2]],  # Max, min, min
-            [max_corner[0], min_corner[1], max_corner[2]],  # Max, min, max
-            [max_corner[0], max_corner[1], min_corner[2]],  # Max, max, min
-            [max_corner[0], max_corner[1], max_corner[2]]   # Max corner
-        ]
-        
-        # Convert corners to XYZ format for plotting
-        xs, ys, zs = zip(*corners)
-        
-        # Plot
-        ax.scatter(xs, ys, zs, label=color, alpha=0.5)
-        ax.legend()
-
-# Plot original ranges
-plot_ranges(ax1, original_ranges, ['r', 'g', 'b', 'm'])
-
-# Plot adjusted ranges
-plot_ranges(ax2, adjusted_ranges, ['r', 'g', 'b', 'm'])
-
 
 def draw_cube(ax, min_corner, max_corner, color):
     # Generate corners of the cube
@@ -125,5 +77,19 @@ for i, (color, range) in enumerate(original_ranges.items()):
 # Draw adjusted ranges with cube faces
 for i, (color, range) in enumerate(adjusted_ranges.items()):
     draw_cube(ax2, range['min'], range['max'], colors[i])
+
+# Add other custom points to the plot
+custom = {
+    "Red": (171, 94, 106),
+    "Blue": (169, 98, 111),
+    "Green": (108, 146, 112),
+    "Purple": (175, 106, 120)
+}
+
+i =0
+for color, point in custom.items():
+    ax1.scatter(*point, color=colors[i], s=100, label=colors[i])
+    ax2.scatter(*point, color=colors[i], s=100, label=colors[i])
+    i += 1
 
 plt.show()

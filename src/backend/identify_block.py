@@ -1,4 +1,5 @@
 from .connect_to_db import connect_to_mongo
+from itertools import permutations, combinations
 
 def identify_block(block):
 
@@ -8,17 +9,35 @@ def identify_block(block):
     collection = db.color_ranges
     
     sequence = []
+    seq_2 = []
     for rgb in block.raw_sequence:
+        seq_2.append(rgb)
         number = rgb_to_number(rgb, collection)
         sequence.append(number)
 
-    #block_collection = db.block_types
+    #print(f'RGB sequence: {seq_2}')
+    print(f'# sequence: {sequence}')
+    
+    block_collection = db.block_types
+    
+    """This is bad"""
+    for perm in permutations(sequence, len(sequence)):
+        query = {
+            'Sequence': list(perm)
+        }
+        block_type = block_collection.find_one(query)
+        if block_type:
+            print(f'Block: {block_type["block_name"]}\n')
+            client.close()
+            return
+
+    print('No block with this sequence\n')
+
     
     client.close()
 
 
 def rgb_to_number(rgb, collection):
-    
     r, g, b = rgb
     
     query = {
@@ -32,11 +51,18 @@ def rgb_to_number(rgb, collection):
 
     numbers = collection.find(query)
 
+    if numbers.count() == 0:
+        #print(f"No color found for r: {r}, g: {g}, b: {b}\n")
+        return None
+    
+    if numbers.count() == 1:
+        for number in numbers:
+            return number['color#']
+    
     for number in numbers:
-        print(number['color_name'])    
-        #print(f"r: {r}, g: {g}, b: {b}\n")
+        print (number['color#'])
 
-    return numbers
+    
 
 
 if __name__ == '__main__':
