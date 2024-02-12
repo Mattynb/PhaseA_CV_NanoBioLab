@@ -15,25 +15,23 @@ def identify_block(block):
         number = rgb_to_number(rgb, collection)
         sequence.append(number)
 
-    #print(f'RGB sequence: {seq_2}')
+    print(f'RGB sequence: {seq_2}')
     print(f'# sequence: {sequence}')
     
     block_collection = db.block_types
     
-    """This is bad"""
-    for perm in permutations(sequence, len(sequence)):
+    for i in range(len(sequence)):
+        sequence = sequence[1:] + sequence[:1]
+        #print(f'# sequence: {sequence}')
         query = {
-            'Sequence': list(perm)
+            'Sequence': sequence
         }
         block_type = block_collection.find_one(query)
         if block_type:
-            print(f'Block: {block_type["block_name"]}\n')
+            print(f'Block: {block_type["block_name"]} at {block.index}\n')
             client.close()
             return
-
-    print('No block with this sequence\n')
-
-    
+    print(f'Block: Unknown at {block.index}\n')
     client.close()
 
 
@@ -59,8 +57,11 @@ def rgb_to_number(rgb, collection):
         for number in numbers:
             return number['color#']
     
+    print(f"Multiple colors found for r: {r}, g: {g}, b: {b}\n")
     for number in numbers:
-        print (number['color#'])
+        print(number['color#'])
+    for number in numbers:
+        return number['color#']
 
     
 

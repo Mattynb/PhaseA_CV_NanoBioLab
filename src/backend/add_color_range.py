@@ -16,11 +16,12 @@ def add_color_range_to_db():
         ]"""
     
     post = [
-        {"color_name": "Red", "color#" : 1, "min" : (122, 13, 34), "max" : (208, 115, 130)},
-        {"color_name": "Blue", "color#" : 2, "min" : (7,19,130), "max" : (100, 130, 242)},
-        {"color_name": "Green", "color#" : 3, "min" : (80,115,54), "max" : (140, 181, 130)},
-        {"color_name": "Purple", "color#" : 4, "min" : (100, 30, 130), "max" : (160, 115, 206)},
-        ]
+        {"color_name": "Red", "color#" : 1, "min" : (122, 13, 34), "max" : (208, 100, 130)},
+        {"color_name": "Blue", "color#" : 2, "min" : (7,19,130), "max" : (95, 130, 255)},
+        {"color_name": "Green", "color#" : 3, "min" : (80,115,54), "max" : (140, 181, 129)},
+        {"color_name": "Purple", "color#" : 4, "min" : (96, 30, 130), "max" : (160, 150, 250)},
+        {"color_name": "Red2", "color#" : 1, "min" : (161,101,100), "max" : (200,125,150)},    
+    ]
     
     post_id = collection.insert_many(post).inserted_ids
     print(post_id)

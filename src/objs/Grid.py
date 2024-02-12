@@ -160,7 +160,7 @@ class Grid:
         for x in self.grid:
             for sq in x:
                 if len(sq.pins) > 0:
-                    print(f"len(sq.pins): {len(sq.pins)}")
+                    print(f"len(sq.pins) at index {sq.index}: {len(sq.pins)}")
                 if len(sq.pins) >= 4:
                     sq.is_block = True
                     sq.img = self.img

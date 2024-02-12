@@ -59,6 +59,10 @@ class Square:
         self.img = img.copy() if img is not None else None
         #self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
 
+        # rations
+        self.PIN_RATIO = PIN_RATIO
+        self.PLUS_MINUS = PLUS_MINUS
+
 
     def add_p_pin(self, p_pin: MatLike):
         """ Adds a potential pin to the square """
@@ -233,11 +237,38 @@ class Square:
         * avg_color: Average RGB color of the contour.
         """
 
-        # crop the image
-        image_copy = self.img.copy()
+        # copy the image
+        image = self.img.copy()
 
-        image = cv.cvtColor(image_copy, cv.COLOR_BGR2RGB)  # Convert to RGB format
+        #image = cv.cvtColor(image_copy, cv.COLOR_BGR2RGB)  # Convert to RGB format
 
+        (x, y), radius = cv.minEnclosingCircle(contour)
+
+        center = (int(x), int(y))
+        radius = int(radius) - int(self.PLUS_MINUS/2.5)
+
+        # get the pixels inside the minEnclosingCircle
+        mask = np.zeros(image.shape[:2], dtype=np.uint8)
+        cv.circle(mask, center, radius, (255), -1)
+        pixels_inside = image[mask == 255]
+
+        # Calculate the average RGB values
+        average_rgb = np.mean(pixels_inside, axis=0)
+
+        # Remove NaN values
+        average_rgb = np.nan_to_num(average_rgb)
+
+        # show mask
+        """
+        image = cv.bitwise_and(image, image, mask=mask)
+        cv.imshow('mask', image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+        print(corner, average_rgb)#"""
+
+        return [round(x) for x in average_rgb ]
+
+        """
         mask = np.zeros(image.shape[:2], dtype=np.uint8)  # Create a mask with the same height and width as the image
         cv.drawContours(mask, [contour], 0, (255), -1)  # Fill the contour on the mask
 
@@ -254,6 +285,8 @@ class Square:
             print(f"     {corner}: ", [round(x) for x in average_rgb ])
 
         return [round(x) for x in average_rgb ]
+        """
+
 
     def get_pins_rgb(self, pf=1):
         """ 

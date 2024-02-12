@@ -24,7 +24,7 @@ def main(path_to_imgs):
     for img in original_images:
         try:
             # Create Image object from loaded image
-            Image_i = Image(id, img, 0.3); print(f"Image {id} loaded")
+            Image_i = Image(id, img, 0.35); print(f"Image {id} loaded")
             id += 1
 
         except AttributeError:
