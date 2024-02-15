@@ -142,9 +142,20 @@ class Grid:
                     for p_pin in sq.p_pins:
                         x, y, w, h = cv.boundingRect(p_pin)
                         
-                        # checks if top left or bottom right point of pin is inside corner of square
-                        if sq.is_in_corners(x, y) or sq.is_in_corners(x+int(w), y+int(h)):
-                            
+                        in_corner = False
+                        # checks if top left or bottom right point of pin is inside corner of square within error range
+                        if sq.is_in_corners(x, y):
+                            in_corner = True
+                        elif sq.is_in_corners(x+int(w), y+int(h)):
+                            in_corner = True
+                        elif sq.is_in_corners(x-int(w), y-int(h)):
+                            in_corner = True
+                        elif sq.is_in_corners(x+int(w), y-int(h)):
+                            in_corner = True
+                        elif sq.is_in_corners(x-int(w), y+int(h)):
+                            in_corner = True
+                        
+                        if in_corner == True:
                             sq.add_pin(p_pin)
                             sq.draw_pins(image_copy)
                             self.show_gridLines(image_copy)
@@ -165,29 +176,13 @@ class Grid:
                     sq.is_block = True
                     self.blocks.append(sq)
 
-                    """
-                    cv.imshow('block', sq.img)
-                    cv.waitKey(0)
-                    cv.destroyAllWindows()
-                    #"""
-                    
-                    # outputs the rgb sequence of the pins in the block
-                    # return ...
-                    
-                    #print(f"Square at index: {sq.index}", "{", sq.get_pins_rgb(), "}\n") 
-                    #"""
-
-
         # shows image with pins and corners drawn
         #'''
-        #self.show_gridLines(image_copy)
-        image_copy = cv.resize(image_copy, (500, 500))
+        image_copy = cv.resize(image_copy, (800, 800))
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
         #'''
-        #cv.destroyAllWindows()
-
     
     def find_p_pins(self, contours: list[MatLike]):
         """
