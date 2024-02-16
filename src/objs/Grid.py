@@ -42,10 +42,10 @@ class Grid:
         self.MAX_XY = self.img.shape[0] # assumes image is square
 
         # ratios measured experimentally as a percentage of the grid
-        self.PIN_RATIO = round(self.MAX_XY * 0.012)     # size of pin diameter/grid size
-        self.EDGE_RATIO = round(self.MAX_XY * 0.01)     # size of edge/grid size. Edge is the "lines" around squares 
-        self.SQUARE_RATIO = round(self.MAX_XY * 0.089)  # squares are the places where you can insert the ampli blocks
-        self.PLUS_MINUS = round(self.MAX_XY * 0.005)    # an arbitrary general tolerance
+        self.PIN_RATIO = int(self.MAX_XY * 0.012)     # size of pin diameter/grid size
+        self.EDGE_RATIO = int(self.MAX_XY * 0.01)     # size of edge/grid size. Edge is the "lines" around squares 
+        self.SQUARE_RATIO = int(self.MAX_XY * 0.089)  # squares are the places where you can insert the ampli blocks
+        self.PLUS_MINUS = int(self.MAX_XY * 0.005)    # an arbitrary general tolerance
         self.SQUARE_LENGTH = self.SQUARE_RATIO + self.EDGE_RATIO 
 
         self.MAX_INDEX = 9  # assumes grid is square 10x10 
@@ -163,7 +163,6 @@ class Grid:
                     print(f"len(sq.pins) at index {sq.index}: {len(sq.pins)}")
                 if len(sq.pins) >= 4:
                     sq.is_block = True
-                    sq.img = self.img
                     self.blocks.append(sq)
 
                     """
@@ -182,6 +181,7 @@ class Grid:
         # shows image with pins and corners drawn
         #'''
         #self.show_gridLines(image_copy)
+        image_copy = cv.resize(image_copy, (500, 500))
         cv.imshow('blocks', image_copy)
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -201,6 +201,20 @@ class Grid:
 
         # Square structures are 4 points (in this case potential pins) arranged in the shape of a square
         square_structures, p_pins  = self.square_structures(contours)
+
+        #"""
+        img_cp = self.img.copy()
+        for sq in square_structures:
+            top_left = (min(sq, key=lambda x: x[0])[0], min(sq, key=lambda y: y[1])[1])
+            bottom_right = (max(sq, key=lambda x: x[0])[0], max(sq, key=lambda y: y[1])[1])
+
+            cv.rectangle(img_cp, top_left, bottom_right, (255,0,0), 3)
+        
+        img_cp = cv.resize(img_cp, (800,800))
+        cv.imshow('blank', img_cp)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+        #"""
 
         # indexes around the perimeter of grid
         top_row    = [(x, 0) for x in range(self.MAX_INDEX + 1)]
@@ -255,10 +269,6 @@ class Grid:
         centers = list(center_to_contour_index.keys()) 
         centers = [x for x in centers if x != None]
 
-        # Create a blank image to draw the squares on, for visual confirmation.
-        height, width, _ = self.img.shape
-        blank_image = np.zeros((height,width,3), np.uint8)
-
         # Find all combinations of four points       
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
@@ -273,11 +283,6 @@ class Grid:
                 contour_indices = [center_to_contour_index[point] for point in comb]
                 p_pins.append([contours[i] for i in contour_indices])
 
-                #"""
-                cv.rectangle(blank_image, comb[0], comb[3], (0, 255, 0), 1)
-                cv.imshow('blank', blank_image)
-                #""""
-                
         return square_structures, p_pins
 
     # checks if a combination of points are arranged in the shape of a square 
@@ -290,15 +295,27 @@ class Grid:
         
         # Assuming points is a list of four (x, y) tuples
         # Calculate distances between each pair of points
-        dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4)]
+        dists = []
+        for i in range(4):
+            for j in range( i + 1, 4):
+               dists.append(distance(points[i], points[j]))
+        
+        #dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4 - i)]
         dists.sort()
-
+        """ if (
+            np.isclose(dists[0], dists[1], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[1], dists[2], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[2], dists[3], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[4], dists[5], atol=0.02, rtol=0.02)
+        ):
+            print(dists)"""
+        
         # Check for four sides of equal length and two equal diagonals
         return (
-            np.isclose(dists[0], dists[1], atol=0.05, rtol=0.05) 
-            and np.isclose(dists[1], dists[2], atol=0.05, rtol=0.05) 
-            and np.isclose(dists[2], dists[3], atol=0.05, rtol=0.05) 
-            and np.isclose(dists[4], dists[5], atol=0.05, rtol=0.05)
+            np.isclose(dists[0], dists[1], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[1], dists[2], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[2], dists[3], atol=0.02, rtol=0.02) 
+            and np.isclose(dists[4], dists[5], atol=0.02, rtol=0.02)
         )
     
     # Appends squares to the grid.
@@ -328,17 +345,21 @@ class Grid:
         """
         
         # draw grid lines
-        for i in range(0 + self.EDGE_RATIO, self.MAX_XY - self.EDGE_RATIO,  self.SQUARE_RATIO + self.EDGE_RATIO):
-            for j in range(0 + self.EDGE_RATIO, self.MAX_XY - self.EDGE_RATIO,  self.SQUARE_RATIO + self.EDGE_RATIO):
-                cv.line(img, (i, 0), (i, self.MAX_XY), (0, 255, 0), 1)
-                cv.line(img, (i + self.SQUARE_RATIO, 0), (i + self.SQUARE_RATIO, self.MAX_XY), (0, 255, 0), 1)
+        for i in range(0 + self.EDGE_RATIO, self.MAX_XY - self.EDGE_RATIO + self.PLUS_MINUS,  self.SQUARE_RATIO + self.EDGE_RATIO ):
+            for j in range(0 + self.EDGE_RATIO, self.MAX_XY - self.EDGE_RATIO + self.PLUS_MINUS,  self.SQUARE_RATIO + self.EDGE_RATIO):
 
-                cv.line(img, (0, i), (self.MAX_XY, i), (0, 255, 0), 1)
-                cv.line(img, (0, i + self.SQUARE_RATIO), (self.MAX_XY, i + self.SQUARE_RATIO), (0, 255, 0), 1)
+                cv.line(img, (i, 0), (i, self.MAX_XY), (0, 255, 0), 2)
+                cv.line(img, (i + self.SQUARE_RATIO, 0), (i + self.SQUARE_RATIO, self.MAX_XY), (0, 255, 0), 2)
 
-        #cv.imshow('grid', img)
-        #cv.waitKey(0)
-        #cv.destroyAllWindows()
+                cv.line(img, (0, i), (self.MAX_XY, i), (0, 255, 0), 2)
+                cv.line(img, (0, i + self.SQUARE_RATIO), (self.MAX_XY, i + self.SQUARE_RATIO), (0, 255, 0), 2)
+
+        """
+        img = cv.resize(img.copy(), (800, 800))
+        cv.imshow('grid', img)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+        #"""
 
 
 

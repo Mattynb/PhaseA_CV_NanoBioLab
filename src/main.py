@@ -24,7 +24,7 @@ def main(path_to_imgs):
     for img in original_images:
         try:
             # Create Image object from loaded image
-            Image_i = Image(id, img, 0.35); print(f"Image {id} loaded")
+            Image_i = Image(id, img, 1); print(f"Image {id} loaded")
             id += 1
 
         except AttributeError:
@@ -64,9 +64,6 @@ if __name__ == '__main__':
 
 
 """
-TODO:
-"database" of block ids 
-
 TODO:
 Image normalization HSV?
 

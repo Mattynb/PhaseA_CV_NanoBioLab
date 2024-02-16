@@ -62,6 +62,7 @@ def pre_process(scaned_image:MatLike):
 
     # Show the result of the pre-processing.
     #"""
+    edges = cv.resize(edges, (500,500))
     cv.imshow('result', edges) #color_mask)
     #cv.waitKey(0)
     #cv.destroyAllWindows()
