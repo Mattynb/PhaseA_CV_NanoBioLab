@@ -103,7 +103,7 @@ def draw_recognized(result, scaned_image) -> list:
     
     MAX_X = scaned_image.shape[0]
     MAX_Y = scaned_image.shape[1] 
-    PIN_RATIO = round(scaned_image.shape[1] * 0.01)
+    PIN_RATIO = round(scaned_image.shape[1] * 0.01)dddd
     EDGE_RATIO = round(scaned_image.shape[1] * 0.01)
     PLUS_MINUS = PIN_RATIO#round(scaned_image.shape[1] * 0.005)
 
