@@ -3,6 +3,7 @@ from PIL import Image as im
 from glob import glob
 import pillow_heif
 import cv2 as cv
+import numpy as np
 
 def image_loader(path_to_images):
     """
@@ -50,3 +51,4 @@ def heic2jpg(path_to_heic):
 
         img = im.open(path)
         img.save(path[:-4] + 'png', format="png")
+

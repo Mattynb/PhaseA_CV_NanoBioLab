@@ -197,8 +197,7 @@ def main(path_to_imgs):
 
    
     plot_quartiles_3d([low,high])
-    #create_excel_file(quartiles)        
-
+    
 if __name__ == '__main__':
     path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\pincolor_list\*"
     main(path_to_imgs)
