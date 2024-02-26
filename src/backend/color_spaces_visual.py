@@ -12,11 +12,11 @@ original_ranges = {
 """
 # Adjusted color ranges
 adjusted_ranges = {
-    "Red": {"min": (122, 13, 34), "max": (208, 100, 130)},
-    "Blue": {"min": (7, 19, 130), "max": (95, 130, 255)},
-    "Green": {"min": (80, 115, 54), "max": (140, 181, 129)},
-    "Purple": {"min": (96, 30, 130), "max": (160, 150, 250)},
-    "Red2": {"min" : (161,101,100), "max" : (200,125,150)},    
+    "Red": {"min": (209-40,0,87-60), "max": (255,88+40,87+40)},
+    "Blue": {"min": (49-40,77-40,232-40), "max": (49+40,77+40,255)},
+    "Green": {"min": (135-60,191-40,0), "max": (135+40,255,110+40)},
+    "Purple": {"min": (140-40,78-40,224-40), "max": (140+40,78+40,224+40)},
+    #"Red2": {"min" : (161,101,100), "max" : (200,125,150)},    
 }
 
 def draw_cube(ax, min_corner, max_corner, color):
@@ -85,10 +85,7 @@ for i, (color, range) in enumerate(adjusted_ranges.items()):
 
 # Add other custom points to the plot
 custom = {
-    "Red": (100, 106, 197),
-    "Blue": (176, 110, 123),
-    "Green": (177, 113, 124),
-    "Purple": (163, 93, 110)
+    "Red": (92, 162, 71)
 }
 
 i =0

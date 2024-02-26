@@ -1,7 +1,10 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from .secrets_ import URI
 
+try:
+    from secrets_ import URI
+except:
+    from .secrets_ import URI
 
 
 def connect_to_mongo():
