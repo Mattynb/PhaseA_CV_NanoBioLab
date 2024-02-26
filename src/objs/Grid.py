@@ -261,7 +261,7 @@ class Grid:
 
         # Find all combinations of four points       
 
-        """TODO: If it is a square, remove the contours from the combinations list"""
+        """TODO:  If it is a square, remove the contours from the combinations list"""
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
             if is_arranged_as_square(comb):
