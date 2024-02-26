@@ -1,5 +1,4 @@
 from .connect_to_db import connect_to_mongo
-from itertools import permutations, combinations
 
 def identify_block(block):
 

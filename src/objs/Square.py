@@ -212,14 +212,17 @@ class Square:
                     return corn[i]
             i += 1
 
+        #print(f"Contour not in any corner: {x,y}")
+
 
         # might be unecessary after corner skewing
         i =0
         for corner in self.corners:
-            if x + 5 >= corner[0][0] and x - 5 <= corner[1][0]:
-                if y + 5  >= corner[0][1] and y - 5  <= corner[1][1]:
+            if x + (2*self.PLUS_MINUS) >= corner[0][0] and x - (2*self.PLUS_MINUS) <= corner[1][0]:
+                if y + (2*self.PLUS_MINUS)  >= corner[0][1] and y - (2*self.PLUS_MINUS)  <= corner[1][1]:
                     return corn[i]
             i += 1
+
 
 
     def get_rgb_avg_of_contour(self, contour:MatLike, corner:list[MatLike]='', print_flag:int = 1):
@@ -240,7 +243,7 @@ class Square:
         # copy the image
         image = self.img.copy()
 
-        #image = cv.cvtColor(image_copy, cv.COLOR_BGR2RGB)  # Convert to RGB format
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)  # Convert to RGB format
 
         (x, y), radius = cv.minEnclosingCircle(contour)
 
@@ -268,24 +271,6 @@ class Square:
 
         return [round(x) for x in average_rgb ]
 
-        """
-        mask = np.zeros(image.shape[:2], dtype=np.uint8)  # Create a mask with the same height and width as the image
-        cv.drawContours(mask, [contour], 0, (255), -1)  # Fill the contour on the mask
-
-        # Extract the pixels inside the contour
-        pixels_inside = image[mask == 255]
-
-        # Calculate the average RGB values
-        average_rgb = np.mean(pixels_inside, axis=0)
-        
-        # Remove NaN values 
-        average_rgb = np.nan_to_num(average_rgb)
-
-        if print_flag:
-            print(f"     {corner}: ", [round(x) for x in average_rgb ])
-
-        return [round(x) for x in average_rgb ]
-        """
 
 
     def get_pins_rgb(self, pf=1):
@@ -327,7 +312,8 @@ class Square:
         for key in ["top_left", "top_right", "bottom_left", "bottom_right"]:
             try: 
                 sequence.append(pins_rgb[corner_key.index(key)]) 
-            except:
+            except ValueError:
+                print(f"Key {key} not found in {corner_key}")
                 sequence.append((0,0,0))
 
 

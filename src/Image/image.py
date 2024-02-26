@@ -24,7 +24,7 @@ class Image:
     * resize_2_std : resize image to a standard size
     * show_steps : show the steps img_og -> img_resized -> img_scan
     """
-    def __init__(self, id: int, image_og: MatLike, resize_factor : float = 1):
+    def __init__(self, id: int, image_og: MatLike, resize_factor : float = .25):
         self.id = id
         
         self.img_og = image_og  # original image
