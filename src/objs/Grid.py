@@ -133,31 +133,27 @@ class Grid:
 
         # checks if the potential pins are in one of the corners of square.
         # adds potential pin as a pin to the square if it is.
-        for x in self.grid:
-            for sq in x:
-                #sq.draw_corners(image_copy)
-                if len(sq.p_pins) >= 2:
-                    for p_pin in sq.p_pins:
-                        x, y, w, h = cv.boundingRect(p_pin)
-                        
-                        in_corner = False
-                        # checks if top left or bottom right point of pin is inside corner of square within error range
-                        if sq.is_in_corners(x, y):
-                            in_corner = True
-                        elif sq.is_in_corners(x+int(w), y+int(h)):
-                            in_corner = True
-                        elif sq.is_in_corners(x-int(w), y-int(h)):
-                            in_corner = True
-                        elif sq.is_in_corners(x+int(w), y-int(h)):
-                            in_corner = True
-                        elif sq.is_in_corners(x-int(w), y+int(h)):
-                            in_corner = True
-                        
-                        if in_corner == True:
-                            sq.add_pin(p_pin)
-                            #sq.draw_pins(image_copy)
-                            #self.show_gridLines(image_copy)
-                            #sq.draw_corners(image_copy)
+        for sq in itertools.chain(*self.grid):
+            if len(sq.p_pins) <= 2:
+                continue
+
+            for p_pin in sq.p_pins:
+                x, y, w, h = cv.boundingRect(p_pin)
+                
+                in_corner = False
+                # checks if top left or bottom right point of pin is inside corner of square within error range
+                if (sq.is_in_corners(x, y) or
+                    sq.is_in_corners(x+int(w), y+int(h)) or
+                    sq.is_in_corners(x-int(w), y-int(h)) or
+                    sq.is_in_corners(x+int(w), y-int(h)) or
+                    sq.is_in_corners(x-int(w), y+int(h))):
+                    in_corner = True
+                
+                if in_corner == True and p_pin not in sq.pins:
+                    sq.add_pin(p_pin)
+                    #sq.draw_pins(image_copy)
+                    #self.show_gridLines(image_copy)
+                    #sq.draw_corners(image_copy)
                             
         
         """
@@ -264,6 +260,8 @@ class Grid:
         centers = [x for x in centers if x != None]
 
         # Find all combinations of four points       
+
+        """TODO: If it is a square, remove the contours from the combinations list"""
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
             if is_arranged_as_square(comb):
@@ -271,11 +269,20 @@ class Grid:
                 # Add the square to the list of combinations if it is arranged as a square
                 square_structures.append(list(comb))
                 
-                #print("Found a square:", [xy_to_index(self, x,y) for x, y in combination])
+                cv.rectangle(self.img, (min(comb, key=lambda x: x[0])[0], min(comb, key=lambda y: y[1])[1]), (max(comb, key=lambda x: x[0])[0], max(comb, key=lambda y: y[1])[1]), (255,0,0), 3)
+                cv.imshow('blank', self.img)
+                cv.waitKey(0)
+                cv.destroyAllWindows()
 
                 # Find the indices of the contours that form the square
                 contour_indices = [center_to_contour_index[point] for point in comb]
                 p_pins.append([contours[i] for i in contour_indices])
+                
+
+                combinations
+
+        # Remove the combinations that are arranged as squares
+        combinations = [comb for comb in combinations if not is_arranged_as_square(comb)]
 
         return square_structures, p_pins
 

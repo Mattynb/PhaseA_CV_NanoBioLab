@@ -24,7 +24,7 @@ class Image:
     * resize_2_std : resize image to a standard size
     * show_steps : show the steps img_og -> img_resized -> img_scan
     """
-    def __init__(self, id: int, image_og: MatLike, resize_factor : float = .25):
+    def __init__(self, id: int, image_og: MatLike, resize_factor : float = .15):
         self.id = id
         
         self.img_og = image_og  # original image
@@ -77,8 +77,8 @@ class Image:
 
     def white_balance(self, image):
 
-        reference_size=(10, 10)
-        reference_top_left=(82, 100)
+        reference_size=(20, 20)
+        reference_top_left=(62, 80)
 
         
 
