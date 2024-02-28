@@ -1,8 +1,11 @@
+from math import e
 from re import I
+from turtle import st
 import cv2 as cv
 from cv2.typing import MatLike
 from .scanner import image_scaner
 import numpy as np
+import time
 
 class Image:
     """
@@ -29,16 +32,24 @@ class Image:
         
         self.img_og = image_og  # original image
 
+        start = time.time()
         # resizing image to fit i screen
         self.img_resized: MatLike = self.resize_2_std(image_og, resize_factor)
-        
+        end = time.time()
+        #print(f"Time to resize image: {end - start} seconds")
+
+
         # scanning the grid in the image
         w, h = self.img_resized.shape[:2] 
+        start = time.time()
         img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
-        self.img_scan = self.white_balance(img_scan)   
-    
-        cv.imwrite(f"img_{self.id}_scan.jpg", self.img_scan)
+        end = time.time()
+        #print(f"Time to scan image: {end - start} seconds")
 
+        start = time.time()
+        self.img_scan = self.white_balance(img_scan)   
+        end = time.time()
+        #print(f"Time to white balance image: {end - start} seconds")
         #self.show_steps()
 
     def resize_2_std(self, img: MatLike, factor: float, w:int=None, h:int = None):
@@ -98,7 +109,7 @@ class Image:
         # Clip the values to the valid range [0, 255]
         balanced_image = np.clip(balanced_image, 0, 255).astype(np.uint8)
 
-        cv.rectangle(balanced_image, reference_top_left, (reference_top_left[0] + reference_size[0], reference_top_left[1] + reference_size[1]), (0, 255, 0), 2)
+        #cv.rectangle(balanced_image, reference_top_left, (reference_top_left[0] + reference_size[0], reference_top_left[1] + reference_size[1]), (0, 255, 0), 2)
         
         return balanced_image
         

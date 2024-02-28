@@ -1,6 +1,7 @@
+from tracemalloc import start
 from image import Image, image_loader, pre_process
 from objs import Grid
-
+import time
 from backend import identify_block
 
 def main(path_to_imgs):
@@ -16,33 +17,46 @@ def main(path_to_imgs):
     None
     """
 
+    start = time.time()
     # loading image files in a way we can use
     original_images = image_loader(path_to_imgs)
+    end = time.time()
+    #print(f"Time to load images: {end - start} seconds")
 
     # creating an Image object, Grid object, and finding blocks for each image
     id = 0
     for img in original_images:
         try:
             # Create Image object from loaded image
-            Image_i = Image(id, img, 1); print(f"Image {id} loaded")
+            start = time.time()
+            Image_i = Image(id, img, 0.35); print(f"Image {id} loaded")
             id += 1
+            end = time.time()
+            #print(f"Time to create Image object: {round(end - start,2)} seconds")
 
         except AttributeError:
             # if the image is not loading
             print("\nImage not loaded, check path\n")
             continue
 
-
+        
         # creating a grid object with the scanned image
+        start = time.time()
         Grid_DS = Grid(Image_i.img_scan); #Grid_DS.show_gridLines()
-
+        end = time.time()
+        #print(f"Time to create Grid object: {round(end - start,2)} seconds")
 
         # finds the contours around non-grayscale (colorful) edges in image
+        start = time.time()
         contours = pre_process(Image_i.img_scan)
-
+        end = time.time()
+        #print(f"Time to find contours: {round(end - start,2)} seconds")
 
         # determines what squares in grid are blocks
+        start = time.time()
         Grid_DS.find_blocks(contours)
+        end = time.time()
+        print(f"Time to find blocks: {round(end - start,2)} seconds")
 
         print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
         # identifies type of blocks in the grid

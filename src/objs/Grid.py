@@ -259,30 +259,20 @@ class Grid:
         centers = list(center_to_contour_index.keys()) 
         centers = [x for x in centers if x != None]
 
-        # Find all combinations of four points       
-
-        """TODO:  If it is a square, remove the contours from the combinations list"""
+        # Find all combinations of four points      
+        
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
-            if is_arranged_as_square(comb):
-                
+            cv.destroyAllWindows()
+            if is_arranged_as_square(comb, self.img): 
+
                 # Add the square to the list of combinations if it is arranged as a square
                 square_structures.append(list(comb))
-                
-                cv.rectangle(self.img, (min(comb, key=lambda x: x[0])[0], min(comb, key=lambda y: y[1])[1]), (max(comb, key=lambda x: x[0])[0], max(comb, key=lambda y: y[1])[1]), (255,0,0), 3)
-                cv.imshow('blank', self.img)
-                cv.waitKey(0)
-                cv.destroyAllWindows()
 
                 # Find the indices of the contours that form the square
                 contour_indices = [center_to_contour_index[point] for point in comb]
                 p_pins.append([contours[i] for i in contour_indices])
-                
 
-                combinations
-
-        # Remove the combinations that are arranged as squares
-        combinations = [comb for comb in combinations if not is_arranged_as_square(comb)]
 
         return square_structures, p_pins
 

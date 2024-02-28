@@ -55,7 +55,7 @@ def contour_is_circular(contour: MatLike):
     return False
 
 # checks if a combination of points are arranged in the shape of a square 
-def is_arranged_as_square(points:list[tuple]):
+def is_arranged_as_square(points:list[tuple], img):
     """
     checks if a combination of points are arranged in the shape of a square
     ----------
@@ -65,27 +65,63 @@ def is_arranged_as_square(points:list[tuple]):
     # Assuming points is a list of four (x, y) tuples
     # Calculate distances between each pair of points
     dists = []
-    for i in range(4):
-        for j in range(i + 1, 4):
-            dists.append(distance(points[i], points[j]))
-    
+    for i in range(3):
+        dists.append(distance(points[i], points[i + 1]))
+    dists.append(distance(points[0], points[3]))
+
+    # corners
+    dists.append(distance(points[0], points[2]))
+    dists.append(distance(points[1], points[3]))
+
+
     #dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4 - i)]
     dists.sort()
-    """ if (
-        np.isclose(dists[0], dists[1], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[1], dists[2], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[2], dists[3], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[4], dists[5], atol=0.02, rtol=0.02)
+    #""" 
+    if (
+        # x0 == x3
+        np.isclose(points[0][0], points[3][0], atol=0.1, rtol=0.1) 
+        
+        # y0 == y1
+        and np.isclose(points[0][1], points[1][1], atol=0.1, rtol=0.1) 
+        
+        # x1 == x2
+        and np.isclose(points[1][0], points[2][0], atol=0.1, rtol=0.1) 
+        
+        # y2 == y3
+        and np.isclose(points[2][1], points[3][1], atol=0.1, rtol=0.1)
+
+        # diagonals are equal
+        and np.isclose(dists[3], dists[4], atol=0.1, rtol=0.1)
+        
+        # sides are equal
+        and np.isclose(dists[0], dists[1], atol=0.3, rtol=0.3)
+        and np.isclose(dists[1], dists[2], atol=0.3, rtol=0.3)
+        and np.isclose(dists[2], dists[3], atol=0.3, rtol=0.3)
     ):
-        print(dists)"""
+
+        """
+        x0 == x3
+        y0 == y1
+        
+        x1 == x2
+
+        y2 == y3
+        """
+
+        copy =  img.copy()
+        for i in range(len(points)):
+            cv.circle(copy, points[i], 5, (0, 0, 255), -1)
+            cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
+            cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+
+        cv.imshow("Square", copy)
+        cv.waitKey(0)
+        cv.destroyAllWindows()        
+        print(dists)#"""
     
+
     # Check for four sides of equal length and two equal diagonals
-    return (
-        np.isclose(dists[0], dists[1], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[1], dists[2], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[2], dists[3], atol=0.02, rtol=0.02) 
-        and np.isclose(dists[4], dists[5], atol=0.02, rtol=0.02)
-    )
+    return False
 
 
 # Finds center point of contour 
