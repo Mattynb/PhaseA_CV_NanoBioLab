@@ -42,13 +42,10 @@ class Image:
         # scanning the grid in the image
         w, h = self.img_resized.shape[:2] 
         start = time.time()
-        img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
+        self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
         end = time.time()
         #print(f"Time to scan image: {end - start} seconds")
 
-        start = time.time()
-        self.img_scan = self.white_balance(img_scan)   
-        end = time.time()
         #print(f"Time to white balance image: {end - start} seconds")
         #self.show_steps()
 
@@ -86,32 +83,7 @@ class Image:
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    def white_balance(self, image):
-
-        reference_size=(20, 20)
-        reference_top_left=(62, 80)
-
-        
-
-        # Create the reference 10x10 square for the reference region for white balancing
-        reference_region = image[reference_top_left[1]:reference_top_left[1] + reference_size[1],
-                                reference_top_left[0]:reference_top_left[0] + reference_size[0]]
-
-        # Calculate the mean RGB values of the reference region - image white baseline value
-        mean_reference = np.mean(reference_region, axis=(0, 1))
-
-        # Scaling factors for each channel
-        scale_factors = 255.0 / mean_reference
-
-        # Apply white balancing to the entire image by multiplying the image to the scale factor
-        balanced_image = cv.merge([cv.multiply(image[:, :, i], scale_factors[i]) for i in range(3)])
-
-        # Clip the values to the valid range [0, 255]
-        balanced_image = np.clip(balanced_image, 0, 255).astype(np.uint8)
-
-        #cv.rectangle(balanced_image, reference_top_left, (reference_top_left[0] + reference_size[0], reference_top_left[1] + reference_size[1]), (0, 255, 0), 2)
-        
-        return balanced_image
+    
         
 
 

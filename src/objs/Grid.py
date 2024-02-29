@@ -168,7 +168,7 @@ class Grid:
                     self.blocks.append(sq)
 
         # shows image with pins and corners drawn
-        #'''
+        '''
         image_copy = image_copy.copy()
         for blk in self.blocks:
             blk.draw_pins(image_copy)
@@ -202,9 +202,12 @@ class Grid:
 
             cv.rectangle(img_cp, top_left, bottom_right, (255,0,0), 3)
         
-        img_cp = cv.resize(img_cp, (800,800))
+        img_cp = cv.resize(img_cp, (500,500))
         cv.imshow('blank', img_cp)
-        cv.waitKey(0)
+
+        from random import randint
+        cv.imwrite(f"{randint(0,100)}.png", img_cp)
+        cv.waitKey(250)
         cv.destroyAllWindows()
         #"""
 

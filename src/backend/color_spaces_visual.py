@@ -5,17 +5,17 @@ from mpl_toolkits.mplot3d import Axes3D
 """
 original_ranges = {
     "Red": {"min": (122, 13, 34), "max": (208, 145, 160)},
-    "Blue": {"min": (7, 19, 139), "max": (147, 148, 242)},
+    "Blue": {"min": (7, 19, 139s), "max": (147, 148, 242)},
     "Green": {"min": (80, 117, 54), "max": (163, 181, 156)},
     "Purple": {"min": (83, 36, 143), "max": (148, 122, 206)}
 }
 """
 # Adjusted color ranges
 adjusted_ranges = {
-    "Red": {"min": (209-40,0,87-60), "max": (255,88+40,87+40)},
-    "Blue": {"min": (49-40,77-40,232-40), "max": (49+40,77+40,255)},
-    "Green": {"min": (135-60,191-40,0), "max": (135+40,255,110+40)},
-    "Purple": {"min": (140-40,78-40,224-40), "max": (140+40,78+40,224+40)},
+    "Red": {"min": (150,0,0), "max": (255,150,87+40)},
+    "Blue": {"min": (49-40,77-40,150), "max": (110,77+40+50,255)},
+    "Green": {"min": (50,100,0), "max": (149,255,125)},
+    "Purple": {"min": (111,78-40,150), "max": (255+25,78+40+50,255)},
     #"Red2": {"min" : (161,101,100), "max" : (200,125,150)},    
 }
 
@@ -84,14 +84,21 @@ for i, (color, range) in enumerate(adjusted_ranges.items()):
     draw_cube(ax2, range['min'], range['max'], colors[i])
 
 # Add other custom points to the plot
-custom = {
-    "Red": (92, 162, 71)
-}
+customs = [
+{      
+    "Red": [114, 159, 80],
+    "1":  [123, 77, 188],
+    "2": [125, 75, 195],
+    "3": [125, 70, 200]
+},
+]
 
-i =0
-for color, point in custom.items():
-    #ax1.scatter(*point, color=colors[i], s=100, label=colors[i])
-    ax2.scatter(*point, color=colors[i], s=100, label=colors[i])
+i =3
+for custom in customs:
+    for color, point in custom.items():
+        #ax1.scatter(*point, color=colors[i], s=100, label=colors[i])
+        ax2.scatter(*point, color=colors[i], s=100, label=colors[i])
+        
     i += 1
 
 plt.show()

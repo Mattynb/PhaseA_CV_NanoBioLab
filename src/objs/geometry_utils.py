@@ -55,7 +55,7 @@ def contour_is_circular(contour: MatLike):
     return False
 
 # checks if a combination of points are arranged in the shape of a square 
-def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
+def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int, flag=0):
     """
     checks if a combination of points are arranged in the shape of a square
     ----------
@@ -65,9 +65,10 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
     # Convert tuples to lists
     points = [list(point) for point in points]
     
-    t = points[2] 
-    points[2] = points[3]
-    points[3] = t
+    if flag:
+        t = points[2] 
+        points[2] = points[3]
+        points[3] = t
 
     # Assuming points is a list of four (x, y) tuples
     # Calculate distances between each pair of points
@@ -82,7 +83,19 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
 
     #dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4 - i)]
     #dists.sort()
-    #""" 
+    """ 
+    
+    copy =  img.copy()
+    for i in range(len(points)):
+        cv.circle(copy, points[i], 5, (0, 0, 255), -1)
+        cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
+        cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+
+    cv.imshow("Square", copy)
+    cv.waitKey(250)
+    cv.destroyAllWindows()        
+    #"""
+
     if (
         # it is around the size of a square
         all(dist < SQUARE_LENGTH for dist in dists)
@@ -107,7 +120,6 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
         and np.isclose(dists[1], dists[2], atol=0.1, rtol=0.1)
         and np.isclose(dists[2], dists[3], atol=0.1, rtol=0.1)
     ):
-
         copy =  img.copy()
         for i in range(len(points)):
             cv.circle(copy, points[i], 5, (0, 0, 255), -1)
@@ -117,10 +129,11 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
         cv.imshow("Square", copy)
         cv.waitKey(250)
         cv.destroyAllWindows()        
-        print(dists)#"""
-
         return True
 
+        
+    if not flag:
+        return is_arranged_as_square(points, img, SQUARE_LENGTH, 1)
 
     # Check for four sides of equal length and two equal diagonals
     return False

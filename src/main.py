@@ -29,7 +29,7 @@ def main(path_to_imgs):
         try:
             # Create Image object from loaded image
             start = time.time()
-            Image_i = Image(id, img, .5); print(f"Image {id} loaded")
+            Image_i = Image(id, img, 1); print(f"Image {id} loaded")
             id += 1
             end = time.time()
             #print(f"Time to create Image object: {round(end - start,2)} seconds")
@@ -66,7 +66,7 @@ def main(path_to_imgs):
         
 
 if __name__ == '__main__':
-    path_to_imgs =  r"data\New_images_022624\IMG_5514.JPEG" #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
+    path_to_imgs =  r"data\New_images_022624\*" #"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\img_5356"    #IMG_5020.JPEG
     main(path_to_imgs)
 
     #path_new = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\grid_on_black_img\std_angle\IMG_5020.jpeg" 
