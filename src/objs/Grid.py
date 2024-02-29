@@ -264,7 +264,7 @@ class Grid:
         combinations = list(itertools.combinations(centers, 4))
         for comb in combinations:
             cv.destroyAllWindows()
-            if is_arranged_as_square(comb, self.img): 
+            if is_arranged_as_square(comb, self.img, self.SQUARE_LENGTH): 
 
                 # Add the square to the list of combinations if it is arranged as a square
                 square_structures.append(list(comb))

@@ -55,31 +55,40 @@ def contour_is_circular(contour: MatLike):
     return False
 
 # checks if a combination of points are arranged in the shape of a square 
-def is_arranged_as_square(points:list[tuple], img):
+def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
     """
     checks if a combination of points are arranged in the shape of a square
     ----------
     points= combination of 4 points (x,y)
     """
     
+    # Convert tuples to lists
+    points = [list(point) for point in points]
+    
+    t = points[2] 
+    points[2] = points[3]
+    points[3] = t
+
     # Assuming points is a list of four (x, y) tuples
     # Calculate distances between each pair of points
     dists = []
     for i in range(3):
         dists.append(distance(points[i], points[i + 1]))
-    dists.append(distance(points[0], points[3]))
+    dists.append(distance(points[3], points[0]))
 
     # corners
     dists.append(distance(points[0], points[2]))
     dists.append(distance(points[1], points[3]))
 
-
     #dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4 - i)]
-    dists.sort()
+    #dists.sort()
     #""" 
     if (
+        # it is around the size of a square
+        all(dist < SQUARE_LENGTH for dist in dists)
+
         # x0 == x3
-        np.isclose(points[0][0], points[3][0], atol=0.1, rtol=0.1) 
+        and np.isclose(points[0][0], points[3][0], atol=0.1, rtol=0.1) 
         
         # y0 == y1
         and np.isclose(points[0][1], points[1][1], atol=0.1, rtol=0.1) 
@@ -91,22 +100,13 @@ def is_arranged_as_square(points:list[tuple], img):
         and np.isclose(points[2][1], points[3][1], atol=0.1, rtol=0.1)
 
         # diagonals are equal
-        and np.isclose(dists[3], dists[4], atol=0.1, rtol=0.1)
+        and np.isclose(dists[5], dists[4], atol=0.1, rtol=0.1)
         
         # sides are equal
         and np.isclose(dists[0], dists[1], atol=0.3, rtol=0.3)
         and np.isclose(dists[1], dists[2], atol=0.3, rtol=0.3)
         and np.isclose(dists[2], dists[3], atol=0.3, rtol=0.3)
     ):
-
-        """
-        x0 == x3
-        y0 == y1
-        
-        x1 == x2
-
-        y2 == y3
-        """
 
         copy =  img.copy()
         for i in range(len(points)):
@@ -118,7 +118,9 @@ def is_arranged_as_square(points:list[tuple], img):
         cv.waitKey(0)
         cv.destroyAllWindows()        
         print(dists)#"""
-    
+
+        return True
+
 
     # Check for four sides of equal length and two equal diagonals
     return False
