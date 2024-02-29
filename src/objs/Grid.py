@@ -1,5 +1,7 @@
 import cv2 as cv
 from cv2.typing import MatLike
+
+from image import image
 from .Square import Square
 import itertools
 from .geometry_utils import contour_is_circular, is_arranged_as_square, find_center_of_points, find_center_of_contour, xy_to_index
@@ -148,20 +150,14 @@ class Grid:
                     sq.is_in_corners(x+int(w), y-int(h)) or
                     sq.is_in_corners(x-int(w), y+int(h))):
                     in_corner = True
-                
-                if in_corner == True and p_pin not in sq.pins:
+
+                if in_corner == True: #and p_pin not in sq.pins
                     sq.add_pin(p_pin)
                     #sq.draw_pins(image_copy)
                     #self.show_gridLines(image_copy)
                     #sq.draw_corners(image_copy)
                             
         
-        """
-        cv.imshow('block', image_copy)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-        """
-    
         # checks if the square has x or more pins and if it does, it is considered a block.
         for x in self.grid:
             for sq in x:
@@ -173,10 +169,16 @@ class Grid:
 
         # shows image with pins and corners drawn
         #'''
-        image_copy = cv.resize(image_copy, (800, 800))
-        cv.imshow('blocks', image_copy)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        image_copy = image_copy.copy()
+        for blk in self.blocks:
+            blk.draw_pins(image_copy)
+            #blk.draw_corners(image_copy)
+            cv.rectangle(image_copy, blk.tl, blk.br, (0,0,255), 3)
+
+            #image_copy = cv.resize(image_copy, (800,800))
+            cv.imshow('blocks', image_copy)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
         #'''
     
     def find_p_pins(self, contours: list[MatLike]):
@@ -190,7 +192,7 @@ class Grid:
         """
 
         # Square structures are 4 points (in this case potential pins) arranged in the shape of a square
-        square_structures, p_pins  = self.square_structures(contours)
+        square_structures, pin_list  = self.square_structures(contours)
 
         #"""
         img_cp = self.img.copy()
@@ -214,21 +216,15 @@ class Grid:
         perimeter_indexes = [] + top_row + bottom_row + left_col + right_col
 
         # adds the 4 potential pins structured as a square shape to the square in the grid where the middle of the structure is located
-        for square_structure in square_structures:
+        for square_structure, pins in zip(square_structures, pin_list):
 
             # middle of the structure 
             center = find_center_of_points(square_structure)
             x_index, y_index = xy_to_index(self, center[0], center[1])
 
             # p_pin contours in p_pins
-            for combin in p_pins:
-                for p_pin in combin:
-                    # check curvature
-                    if contour_is_circular(p_pin) or (x_index, y_index) in perimeter_indexes:
-
-                        #print(f"\n p_pin: {len(p_pins)}x{len(p_pin[0])}x{len(p_pin[0][0])}  = {p_pin[0]}\n")
-                        # add 4 pins to square
-                        self.grid[x_index][y_index].add_p_pin(p_pin)
+            for pin in pins:
+                self.grid[x_index][y_index].add_pin(pin)
 
 
     def square_structures(self, contours: list[MatLike]):
@@ -246,7 +242,7 @@ class Grid:
         * p_pins: list of p_pins
         """
         square_structures = []
-        p_pins = []
+        pins = []
 
         # Find the center point of each contour
         center_to_contour_index = {}
@@ -271,10 +267,10 @@ class Grid:
 
                 # Find the indices of the contours that form the square
                 contour_indices = [center_to_contour_index[point] for point in comb]
-                p_pins.append([contours[i] for i in contour_indices])
+                pins.append([contours[i] for i in contour_indices])
 
 
-        return square_structures, p_pins
+        return square_structures, pins
 
     
     # Appends squares to the grid.

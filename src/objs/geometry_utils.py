@@ -103,9 +103,9 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
         and np.isclose(dists[5], dists[4], atol=0.1, rtol=0.1)
         
         # sides are equal
-        and np.isclose(dists[0], dists[1], atol=0.3, rtol=0.3)
-        and np.isclose(dists[1], dists[2], atol=0.3, rtol=0.3)
-        and np.isclose(dists[2], dists[3], atol=0.3, rtol=0.3)
+        and np.isclose(dists[0], dists[1], atol=0.1, rtol=0.1)
+        and np.isclose(dists[1], dists[2], atol=0.1, rtol=0.1)
+        and np.isclose(dists[2], dists[3], atol=0.1, rtol=0.1)
     ):
 
         copy =  img.copy()
@@ -115,7 +115,7 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int):
             cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
 
         cv.imshow("Square", copy)
-        cv.waitKey(0)
+        cv.waitKey(250)
         cv.destroyAllWindows()        
         print(dists)#"""
 

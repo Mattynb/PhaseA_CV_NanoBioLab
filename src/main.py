@@ -29,7 +29,7 @@ def main(path_to_imgs):
         try:
             # Create Image object from loaded image
             start = time.time()
-            Image_i = Image(id, img, 0.35); print(f"Image {id} loaded")
+            Image_i = Image(id, img, .5); print(f"Image {id} loaded")
             id += 1
             end = time.time()
             #print(f"Time to create Image object: {round(end - start,2)} seconds")
