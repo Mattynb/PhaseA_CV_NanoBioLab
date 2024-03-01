@@ -1,7 +1,62 @@
 import numpy as np
 import cv2 as cv
 from cv2.typing import MatLike
+from .image_white_balancer import WhiteBalanceAdjuster
 
+class ImageProcessor:
+    # A function that pre-processes the image to isolate the color of the pins.
+    def process_image(scanned_image: np.ndarray) -> np.ndarray:
+        """
+        ### Pre-process
+        ---------------
+        Function that pre-processes the image to isolate the color of the pins.
+
+        #### Args:
+        scaned_image: image to be pre-processed
+
+        #### Returns:
+        List of contours
+        """
+
+        scanned_image_copy = scanned_image.copy()
+        
+        # Convert the image to HSV color space. Hue Saturation Value.
+        img_hsv = cv.cvtColor(scanned_image_copy, cv.COLOR_BGR2HSV)
+
+        # Define the lower and upper bounds for the color you want to isolate
+        hsv_lower_color = np.array([0, 55, 0])
+        hsv_upper_color = np.array([180, 255, 255])
+
+        # Create a mask to filter out the grayscale colors isolating the color of the pins.
+        color_mask = cv.inRange(img_hsv, hsv_lower_color, hsv_upper_color)
+        edges = cv.Canny(color_mask, 0, 255)
+        contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+
+        scanned_image = WhiteBalanceAdjuster.adjust(scanned_image)
+
+        return contours
+    
+    # Show the result of the pre-processing.
+    @staticmethod
+    def show_result(edges: np.ndarray) -> None:
+        edges = cv.resize(edges, (500,500))
+        cv.imshow('result', edges) #color_mask)
+        cv.waitKey(250)
+        cv.destroyAllWindows()
+        
+
+
+
+
+"""
+TODO: Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.
+"""
+
+
+
+
+
+""" DEPRECATED FUNCTIONS """
 
 def _pre_process(scaned_image:MatLike):
     # Convert to grayscale
@@ -29,89 +84,7 @@ def _pre_process(scaned_image:MatLike):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-    
 
-
-# A function that pre-processes the image to isolate the color of the pins.
-def pre_process(scaned_image:MatLike):
-    """
-    ### Pre-process
-    ---------------
-    Function that pre-processes the image to isolate the color of the pins.
-
-    #### Args:
-    scaned_image: image to be pre-processed
-
-    #### Returns:
-    List of contours
-    """
-
-    scaned_image_copy = scaned_image.copy()
-    
-    # Convert the image to HSV color space. Hue Saturation Value.
-    img_hsv = cv.cvtColor(scaned_image_copy, cv.COLOR_BGR2HSV)
-
-    # Define the lower and upper bounds for the color you want to isolate
-    hsv_lower_color = np.array([0, 55, 0])
-    hsv_upper_color = np.array([180, 255, 255])
-
-    # Create a mask to filter out the grayscale colors isolating the color of the pins.
-    color_mask = cv.inRange(img_hsv, hsv_lower_color, hsv_upper_color)
-    edges = cv.Canny(color_mask, 0, 255)
-
-    # Find the contours around the edges of the color mask.
-    contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-
-    # Show the result of the pre-processing.
-    #"""
-    edges = cv.resize(edges, (500,500))
-    cv.imshow('result', edges) #color_mask)
-    cv.waitKey(250)
-    cv.destroyAllWindows()
-    #"""
-
-    scaned_image = white_balance(scaned_image)
-
-    return contours
-
-
-
-"""
-TODO: Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.
-"""
-
-def white_balance(image):
-
-        reference_size=(20, 20)
-        reference_top_left=(62, 80)
-
-        
-
-        # Create the reference 10x10 square for the reference region for white balancing
-        reference_region = image[reference_top_left[1]:reference_top_left[1] + reference_size[1],
-                                reference_top_left[0]:reference_top_left[0] + reference_size[0]]
-
-        # Calculate the mean RGB values of the reference region - image white baseline value
-        mean_reference = np.mean(reference_region, axis=(0, 1))
-
-        # Scaling factors for each channel
-        scale_factors = 255.0 / mean_reference
-
-        # Apply white balancing to the entire image by multiplying the image to the scale factor
-        balanced_image = cv.merge([cv.multiply(image[:, :, i], scale_factors[i]) for i in range(3)])
-
-        # Clip the values to the valid range [0, 255]
-        balanced_image = np.clip(balanced_image, 0, 255).astype(np.uint8)
-
-        #cv.rectangle(balanced_image, reference_top_left, (reference_top_left[0] + reference_size[0], reference_top_left[1] + reference_size[1]), (0, 255, 0), 2)
-        
-        return balanced_image
-
-
-
-
-
-""" DEPRECATED FUNCTIONS """
 # A function that draws a rectangle around the recognized pins. Not being used right now. Instead using Grid.find_blocks() from src/objs.py
 def draw_recognized(result, scaned_image) -> list:
     """

@@ -1,55 +1,40 @@
-from math import e
-from re import I
-from turtle import st
 import cv2 as cv
-from cv2.typing import MatLike
-from .scanner import image_scaner
-import numpy as np
-import time
+from numpy import ndarray
+from .image_scanner import ImageScanner
 
 class Image:
-    """
-    ---------------
-    Class that represents an image. It contains the original image, the resized image and the scanned image.
-    
-    #### Args:
-    * id : image id (int)
-    * image_og : original image (MatLike)
-    * resize_factor : factor to resize the image (float)
+    @classmethod
+    def scan(cls, id: int, image: ndarray, resize_factor : float = 1):
+        """
+        ### Image maker
+        Create Image object from loaded image.
 
-    #### Attributes:
-    * id : image id (int)
-    * img_og : original image (MatLike)
-    * img_resized : resized image (MatLike)
-    * img_scan : scanned image (MatLike)
+        #### Args:
+        * id : id of the image
+        * image : loaded image
+        * resize_factor : percentage of current size to resize to
 
-    #### Methods:
-    * resize_2_std : resize image to a standard size
-    * show_steps : show the steps img_og -> img_resized -> img_scan
-    """
-    def __init__(self, id: int, image_og: MatLike, resize_factor : float = .15):
-        self.id = id
+        #### Returns:
+        * Image object | None
+        * id
+        """
+
+        try:
+            # Create Image object from loaded image
+            Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
+            
+            # Resize image to a given percentage of current size
+            Image_i = cls.resize_2_std(Image_i, resize_factor)
+            
+            return Image_i, id
         
-        self.img_og = image_og  # original image
+        except AttributeError:
+            # In case the image is not loaded
+            print("\nImage not loaded, check path\n")
+            return None, id
 
-        start = time.time()
-        # resizing image to fit i screen
-        self.img_resized: MatLike = self.resize_2_std(image_og, resize_factor)
-        end = time.time()
-        #print(f"Time to resize image: {end - start} seconds")
-
-
-        # scanning the grid in the image
-        w, h = self.img_resized.shape[:2] 
-        start = time.time()
-        self.img_scan = self.resize_2_std(image_scaner(self.img_resized), 1, w, w)
-        end = time.time()
-        #print(f"Time to scan image: {end - start} seconds")
-
-        #print(f"Time to white balance image: {end - start} seconds")
-        #self.show_steps()
-
-    def resize_2_std(self, img: MatLike, factor: float, w:int=None, h:int = None):
+    @staticmethod
+    def resize_2_std(img: ndarray, factor: float, w:int=None, h:int = None):
         """
         ### Resize image
         Resize image to a given percentage of current size.
@@ -63,28 +48,11 @@ class Image:
         #### Returns:
         * resized image
         """
+        
+        # If width and height are not given, get them from the image
         if w == None and h == None:
             w, h = img.shape[:2]
 
         resized_image = cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_CUBIC)
         
         return resized_image
-
-
-    def show_steps(self):
-        """
-        ### Show steps
-        Show the steps img_og -> img_resized -> img_scan
-        """
-        
-        cv.imshow('original', self.img_og)
-        cv.imshow('resized', self.img_resized)
-        cv.imshow('scanned', self.img_scan)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
-    
-        
-
-
-
