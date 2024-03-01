@@ -19,19 +19,13 @@ class Image:
         * id
         """
 
-        try:
-            # Create Image object from loaded image
-            Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
-            
-            # Resize image to a given percentage of current size
-            Image_i = cls.resize_2_std(Image_i, resize_factor)
-            
-            return Image_i, id
+        # Create Image object from loaded image
+        Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
         
-        except AttributeError:
-            # In case the image is not loaded
-            print("\nImage not loaded, check path\n")
-            return None, id
+        # Resize image to a given percentage of current size
+        Image_i = cls.resize_2_std(Image_i, resize_factor)
+        
+        return Image_i, id
 
     @staticmethod
     def resize_2_std(img: ndarray, factor: float, w:int=None, h:int = None):

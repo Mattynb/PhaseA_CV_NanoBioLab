@@ -17,7 +17,7 @@ def main(path_to_imgs):
 
     # loading images from given path
     images = ImageLoader.load_images(path_to_imgs)
-    
+
     id = 0
     # Analyzing each image
     for image in images:
@@ -39,12 +39,12 @@ def main(path_to_imgs):
         # is used to store information about the grid, such as 
         # the blocks and pins, etc.
         Grid_DS = Grid(image_scan); #Grid_DS.show_gridLines()
-    
+
 
         # determines what squares in grid are blocks
         Grid_DS.find_blocks(contours)
         print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
-        
+
         # identifies type of blocks in the grid
         for block in Grid_DS.blocks:
             block.get_raw_sequence()
