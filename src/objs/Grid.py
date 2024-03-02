@@ -1,40 +1,26 @@
 import cv2 as cv
-from cv2.typing import MatLike
+import numpy as np
 
-from image import image
 from .Square import Square
 import itertools
-from .geometry_utils import contour_is_circular, is_arranged_as_square, find_center_of_points, find_center_of_contour, xy_to_index
-
-class Grid:
-    """
-    ### Grid
-    ---------------
-    Class that represents the grid in the image.
-
-    #### Args:
-    * img: image
-
-    #### Attributes:
-    * img: image
-    * MAX_XY: max x and y coordinates of the image
-    * grid: represents the grid in the image as a 2D array of squares
-
-    ##### Experimentally Measured Ratios:
-    * PIN_RATIO:     size of pin diameter/grid size
-    * EDGE_RATIO:    size of edge/grid size. Edge is the "lines" around squares
-    * SQUARE_RATIO:  squares are the places where you can insert the ampli blocks
-    * PLUS_MINUS:    an arbitrary general tolerance
-    * SQUARE_LENGTH: SQUARE_RATIO + EDGE_RATIO, used to iterate through the grid
-
-    * MAX_INDEX:     max index of the grid_ds
-
-    #### Methods:
-    * create_grid:   creates a "map" (list of lists) of squares in the grid
+from .utils_geometry import contour_is_circular, is_arranged_as_square, find_center_of_points, find_center_of_contour, xy_to_index
 
 
-    """
-    def __init__(self, img: MatLike):
+from abc import ABC, abstractmethod
+
+class IGrid(ABC):
+    @abstractmethod
+    def create_grid(self):
+        pass
+
+    @abstractmethod
+    def find_blocks(self, contours: list[np.ndarray]):
+        pass
+
+
+
+class Grid(IGrid):
+    def __init__(self, img: np.ndarray):
         # scanned image
         self.img = img.copy()
 
@@ -51,30 +37,14 @@ class Grid:
         self.MAX_INDEX = 9  # assumes grid is square 10x10 
 
         # represents the grid in the image as a 2D array of squares
-        self.grid = self.create_grid()
+        self.grid = [[None for _ in range(self.MAX_INDEX + 1)] for _ in range(self.MAX_INDEX + 1)]
+        self.create_grid()
 
         # list of blocks in the grid
         self.blocks = []
     
     # Creates a "map" (list of lists) of squares in the grid.
     def create_grid(self):
-        """
-        ### Create grid
-        ---------------
-        Function that creates a "map" (list of lists) of squares in the grid. Basically a 2D array of squares.
-
-        #### Args:
-        * None
-
-        #### Returns:
-        * grid_ds: grid object representing the grid in the image as a 2D array of squares
-        """
-
-        # First we initialize 2D array grid_ds with None values. 
-        grid = [[None for _ in range(self.MAX_INDEX + 1)] for _ in range(self.MAX_INDEX + 1)]
-
-        # Next we will replace the None values with Square objects. 
-        
         # These are the stop values for the for loops.
         STOP_XY = self.MAX_XY - self.EDGE_RATIO
         STEP = self.SQUARE_LENGTH
@@ -108,12 +78,10 @@ class Grid:
                 )
                
                 # add the square to the grid list            
-                grid[x_index][y_index] = sq
+                self.grid[x_index][y_index] = sq
                 
-
-        return grid
-    
-    def find_blocks(self, contours: list[MatLike]):
+        
+    def find_blocks(self, contours: list[np.ndarray]):
         """
         ### Find blocks
         ---------------
@@ -181,7 +149,7 @@ class Grid:
             cv.destroyAllWindows()
         #'''
     
-    def find_p_pins(self, contours: list[MatLike]):
+    def find_p_pins(self, contours: list[np.ndarray]):
         """
         ### Find potential pins
         ---------------
@@ -230,7 +198,7 @@ class Grid:
                 self.grid[x_index][y_index].add_pin(pin)
 
 
-    def square_structures(self, contours: list[MatLike]):
+    def square_structures(self, contours: list[np.ndarray]):
         """
         ### Square structures
         ---------------
@@ -295,7 +263,7 @@ class Grid:
         self.grid[x_index][y_index] = square
 
     # Shows the grid lines on the image.
-    def show_gridLines(self, img: MatLike):
+    def show_gridLines(self, img: np.ndarray):
         """
         ### Show grid lines
         ---------------

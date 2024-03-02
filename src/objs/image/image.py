@@ -2,6 +2,7 @@ import cv2 as cv
 from numpy import ndarray
 from .image_scanner import ImageScanner
 
+import time
 class Image:
     @classmethod
     def scan(cls, id: int, image: ndarray, resize_factor : float = 1):
@@ -20,8 +21,10 @@ class Image:
         """
 
         # Create Image object from loaded image
+        t = time.time()
         Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
-        
+        print(f"Processing time: {time.time() - t} seconds")
+
         # Resize image to a given percentage of current size
         Image_i = cls.resize_2_std(Image_i, resize_factor)
         

@@ -54,4 +54,3 @@ class ImageLoader:
 
             img = im.open(path)
             img.save(path[:-4] + 'png', format="png")
-

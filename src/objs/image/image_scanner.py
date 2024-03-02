@@ -1,6 +1,4 @@
-import re
 import cv2 as cv
-from matplotlib.pyplot import contour
 import numpy as np
 
 class ImageScanner:
@@ -12,20 +10,28 @@ class ImageScanner:
                 # GPU acceleration
                 gpu_img = cv.cuda_GpuMat()
                 gpu_img.upload(img)
+                gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
 
-                img = cls.morphological_transform(img)
-                img = cls.remove_background(img)
-                contours = cls.find_contours(img)
-                corners = cls.detect_corners(contours, img)
+                gpu_img = cls.morphological_transform(gpu_img)
+                
+                cpu_img = gpu_img.download()
+                cpu_img = cls.remove_background(cpu_img)
+
+                gpu_img.upload(cpu_img)
+                contours = cls.find_contours(gpu_img)
+                corners = cls.detect_corners(contours, cpu_img)
                 final_image = cls.perspective_transform(image_og, corners)
+                
+                final_image = cv.resize(final_image, (0, 0), fx=1.5, fy=1.5)
                 return final_image
         
         @staticmethod
-        def morphological_transform(img: np.ndarray)->np.ndarray:
+        def morphological_transform(gpu_img: cv.cuda_GpuMat)->  cv.cuda_GpuMat:
                 # APPLYING MORPHOLOGICAL TRANSFORMATIONS TO HIGHLIGHT THE GRID
                 kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
-                img = cv.cuda.morphologyEx(img, cv.MORPH_CLOSE, kernel, iterations=3)  
-                return img
+                morph = cv.cuda.createMorphologyFilter(cv.MORPH_OPEN, gpu_img.type(), kernel, iterations=3)
+                gpu_img = morph.apply(gpu_img)
+                return gpu_img
 
         @staticmethod
         def remove_background(img: np.ndarray)->np.ndarray:
@@ -34,34 +40,29 @@ class ImageScanner:
                 bgdModel = np.zeros((1,65),np.float64)
                 fgdModel = np.zeros((1,65),np.float64)
                 rect = (20,20,img.shape[1]-20,img.shape[0]-20)
+                img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
                 cv.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv.GC_INIT_WITH_RECT)
                 mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
                 return img*mask2[:,:,np.newaxis]
 
         @staticmethod
-        def find_contours(img: np.ndarray)->np.ndarray:
+        def find_contours(gpu_img: cv.cuda_GpuMat)->list:
                 # EDGE DETECTION
-                gray = cv.cuda.cvtColor(img, cv.COLOR_BGR2GRAY)
-                gray = cv.cuda.GaussianBlur(gray, (11, 11), 0)
-                canny = cv.cuda.Canny(gray, 0, 200)
-                canny = cv.dilate(canny, cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5)))
-                canny = canny.download()
+                gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
+                gpu_blurred = cv.cuda.createGaussianFilter(gpu_img.type(), -1, (11, 11), 0).apply(gpu_img)
+                
+                detector = cv.cuda.createCannyEdgeDetector(0, 200)
+                
+                gpu_canny = detector.detect(gpu_blurred)
 
-                # CONTOUR DETECTION
-                con = np.zeros_like(img)  # Blank canvas.
-                # Finding contours for the detected edges.
-                contours, hierarchy = cv.findContours(canny, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-                # Keeping only the largest detected contour.
+                canny_cpu = gpu_canny.download()  # Downloading for CPU processing
+
+                # CONTOUR DETECTION (CPU)
+                contours, _ = cv.findContours(canny_cpu, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
                 return sorted(contours, key=cv.contourArea, reverse=True)[:5]
-               
-                """
-                cv.imshow('contour', con)
-                cv.waitKey(0)  
-                cv.destroyAllWindows()
-                #"""
-
+                
         @classmethod
-        def detect_corners(cls, contours: list, img:np.ndarray)->np.ndarray:
+        def detect_corners(cls, contours: list, img:np.ndarray)->list:
                 # DETECTING THE CORNERS OF THE GRID
 
                 # Loop over the contours.
@@ -90,10 +91,6 @@ class ImageScanner:
                 
                 # Perspective transform using homography.
                 final = cv.warpPerspective(img, M, (destination_corners[2][0], destination_corners[2][1]), flags=cv.INTER_LINEAR)
-                cv.imshow('final', final)
-                cv.waitKey(0)
-                cv.destroyAllWindows()
-                #"""
         
                 return final
 
@@ -140,6 +137,3 @@ class ImageScanner:
                 
                 # Return the ordered coordinates.
                 return rect.astype('int').tolist()
-
-
-        

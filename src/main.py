@@ -1,6 +1,7 @@
 from objs import Grid
 from backend import identify_block
-from image import Image, ImageLoader, ImageProcessor
+from objs import Image, ImageLoader, ImageProcessor
+
 
 def main(path_to_imgs):
     """
@@ -17,7 +18,6 @@ def main(path_to_imgs):
 
     # loading images from given path
     images = ImageLoader.load_images(path_to_imgs)
-
     id = 0
     # Analyzing each image
     for image in images:
@@ -25,6 +25,7 @@ def main(path_to_imgs):
         #   Create Image object from loaded image.
         # The Image object is used to store the image 
         # and the steps of the image processing.
+
         image_scan, id = Image.scan(id, image, 1)
         if image_scan is None: continue
 

@@ -2,6 +2,16 @@ from ast import Tuple
 import cv2 as cv
 from cv2.typing import MatLike
 import numpy as np
+from abc import ABC, abstractmethod
+
+class ISquare(ABC):
+    @abstractmethod
+    def is_in_corners(self, x:int, y:int)->bool:
+        pass
+
+    @abstractmethod
+    def add_pin(self, pin: np.ndarray):
+        pass
 
 class Square:
     """
