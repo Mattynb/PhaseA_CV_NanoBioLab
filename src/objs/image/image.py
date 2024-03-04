@@ -20,14 +20,12 @@ class Image:
         * id
         """
 
-        # Create Image object from loaded image
-        t = time.time()
+        # Scan the image isolating the grid
         Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
-        print(f"Processing time: {time.time() - t} seconds")
 
-        # Resize image to a given percentage of current size
+        # Resize image so that its height and width are the same
         Image_i = cls.resize_2_std(Image_i, resize_factor)
-        
+
         return Image_i, id
 
     @staticmethod
@@ -45,11 +43,11 @@ class Image:
         #### Returns:
         * resized image
         """
-        
+
         # If width and height are not given, get them from the image
         if w == None and h == None:
             w, h = img.shape[:2]
 
         resized_image = cv.resize(img, (int(w*factor), int(h*factor)), interpolation=cv.INTER_CUBIC)
-        
+
         return resized_image

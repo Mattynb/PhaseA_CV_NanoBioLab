@@ -13,9 +13,9 @@ original_ranges = {
 # Adjusted color ranges
 adjusted_ranges = {
     "Red": {"min": (150,0,0), "max": (255,150,87+40)},
-    "Blue": {"min": (49-40,77-40,150), "max": (110,77+40+50,255)},
+    "Blue": {"min": (49-40,77-40,150), "max": (104,77+40+50,255)},
     "Green": {"min": (50,100,0), "max": (149,255,125)},
-    "Purple": {"min": (111,78-40,150), "max": (255+25,78+40+50,255)},
+    "Purple": {"min": (105,78-40,150), "max": (255+25,78+40+50,255)},
     #"Red2": {"min" : (161,101,100), "max" : (200,125,150)},    
 }
 
@@ -86,10 +86,7 @@ for i, (color, range) in enumerate(adjusted_ranges.items()):
 # Add other custom points to the plot
 customs = [
 {      
-    "Red": [114, 159, 80],
-    "1":  [123, 77, 188],
-    "2": [125, 75, 195],
-    "3": [125, 70, 200]
+    "Red": [109, 46, 191],
 },
 ]
 

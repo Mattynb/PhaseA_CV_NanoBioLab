@@ -7,22 +7,22 @@ class ImageScanner:
                 # copy of the image to be scanned (to not mess with the original)
                 img = image_og.copy()
 
-                # GPU acceleration
+                # GPU acceleration for faster processing
                 gpu_img = cv.cuda_GpuMat()
                 gpu_img.upload(img)
                 gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
-
                 gpu_img = cls.morphological_transform(gpu_img)
                 
+                # Only works with CPU
                 cpu_img = gpu_img.download()
                 cpu_img = cls.remove_background(cpu_img)
-
+                
+                # Uploading the image to the GPU again for faster processing
                 gpu_img.upload(cpu_img)
                 contours = cls.find_contours(gpu_img)
                 corners = cls.detect_corners(contours, cpu_img)
                 final_image = cls.perspective_transform(image_og, corners)
                 
-                final_image = cv.resize(final_image, (0, 0), fx=1.5, fy=1.5)
                 return final_image
         
         @staticmethod

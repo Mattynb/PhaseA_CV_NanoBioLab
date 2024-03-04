@@ -48,13 +48,8 @@ def rgb_to_number(rgb, collection):
 
     numbers = collection.find(query)
 
-    if numbers.count() == 0:
-        #print(f"No color found for r: {r}, g: {g}, b: {b}\n")
-        return None
-    
-    if numbers.count() == 1:
-        for number in numbers:
-            return number['color#']
+    for number in numbers:
+        return number['color#']
     
     print(f"Multiple colors found for r: {r}, g: {g}, b: {b}\n")
     for number in numbers:

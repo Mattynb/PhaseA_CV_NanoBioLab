@@ -25,7 +25,6 @@ def main(path_to_imgs):
         #   Create Image object from loaded image.
         # The Image object is used to store the image 
         # and the steps of the image processing.
-
         image_scan, id = Image.scan(id, image, 1)
         if image_scan is None: continue
 
@@ -50,20 +49,13 @@ def main(path_to_imgs):
         for block in Grid_DS.blocks:
             block.get_raw_sequence()
             identify_block(block)
-        
+
 
 if __name__ == '__main__':
-    path_to_imgs =  r"data\New_images_022624\IMG_5514.JPEG"
+    path_to_imgs =  r"data\New_images_022624\IMG_5513.JPEG"
     main(path_to_imgs)
-    
-
-   
-
 
 """
 TODO: 
 image generation with blocks for U-NET (find out what that is)
-
-TODO: 
-Add a descriptive pre_precess function that shows all the steps using the currently commented code in the pre_process function.
 """
