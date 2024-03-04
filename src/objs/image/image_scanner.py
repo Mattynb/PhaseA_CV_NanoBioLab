@@ -12,7 +12,7 @@ class ImageScanner:
                 gpu_img.upload(img)
                 gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
                 gpu_img = cls.morphological_transform(gpu_img)
-                
+                 
                 # Only works with CPU
                 cpu_img = gpu_img.download()
                 cpu_img = cls.remove_background(cpu_img)
