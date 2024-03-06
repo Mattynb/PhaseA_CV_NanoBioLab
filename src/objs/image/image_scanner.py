@@ -2,8 +2,38 @@ import cv2 as cv
 import numpy as np
 
 class ImageScanner:
+        """
+        Class to scan the image and return the scanned image.
+        
+        ## Methods:
+        - `scan(image_og: np.ndarray) -> np.ndarray`
+            - This method scans the image and returns the scanned image.    
+        
+        - `morphological_transform(gpu_img: cv.cuda_GpuMat) -> cv.cuda_GpuMat`
+                - This method applies morphological transformations to highlight the grid.
+        
+        - `remove_background(img: np.ndarray) -> np.ndarray`
+                - This method gets rid of the background through masking + grabcut algorithm.
+        
+        - `find_contours(gpu_img: cv.cuda_GpuMat) -> list`
+                - This method finds the contours of the image.
+        
+        - `detect_corners(contours: list, img: np.ndarray) -> list`
+                - This method detects the corners of the grid.
+        
+        - `perspective_transform(img: np.ndarray, corners: list) -> np.ndarray`
+                - This method applies perspective transform to the image.
+        
+        - `find_dest(pts: list) -> list`
+                - This method finds the destination coordinates.
+        
+        - `order_points(pts: list) -> list`
+                - This method orders the points.
+        """
+
         @classmethod
         def scan(cls, image_og: np.ndarray)->np.ndarray:
+                # copy of the image to be scanned (to not mess with the original)
                 # copy of the image to be scanned (to not mess with the original)
                 img = image_og.copy()
 
@@ -12,7 +42,7 @@ class ImageScanner:
                 gpu_img.upload(img)
                 gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
                 gpu_img = cls.morphological_transform(gpu_img)
-                 
+                
                 # Only works with CPU
                 cpu_img = gpu_img.download()
                 cpu_img = cls.remove_background(cpu_img)
@@ -24,7 +54,6 @@ class ImageScanner:
                 final_image = cls.perspective_transform(image_og, corners)
                 
                 return final_image
-        
         @staticmethod
         def morphological_transform(gpu_img: cv.cuda_GpuMat)->  cv.cuda_GpuMat:
                 # APPLYING MORPHOLOGICAL TRANSFORMATIONS TO HIGHLIGHT THE GRID
