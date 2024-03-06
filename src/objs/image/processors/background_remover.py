@@ -2,7 +2,8 @@ import cv2 as cv
 import numpy as np
 
 
-class BackgroundRemover(ImageProcessor):
+class BackgroundRemover():
+    @staticmethod
     def process_image(image: np.ndarray) -> np.ndarray:
         mask = np.zeros(image.shape[:2], np.uint8)
         bgdModel = np.zeros((1, 65), np.float64)

@@ -1,3 +1,6 @@
 from .background_remover import BackgroundRemover
-from .corner_detector import CornerDetector
-from .contour_finder import ContourFinder
+from .gpu_morphological_transformer import GPUMorphologicalTransformer
+from .image_processor import ImageProcessor
+from .perspective_transformer import PerspectiveTransformer
+
+__all__ = ["BackgroundRemover", "GPUMorphologicalTransformer", "ImageProcessor", "PerspectiveTransformer"]
