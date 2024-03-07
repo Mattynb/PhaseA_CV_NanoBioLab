@@ -42,8 +42,4 @@ class BackgroundRemover():
         # Multiply the image with the mask to remove the background
         im = image * mask2[:, :, np.newaxis]
 
-        cv.imshow('image', im)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
         return im

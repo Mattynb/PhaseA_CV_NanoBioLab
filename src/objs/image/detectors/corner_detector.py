@@ -10,37 +10,46 @@ class CornerDetector:
     ### Methods
     - `detect_corners(contours: list, img: np.ndarray) -> list`
         - This method detects the corners of a given image given the contours and returns the corners.
-    
-    ### Example
-    ```python
-    import cv2 as cv
-    import numpy as np
-    from src.objs.image.detectors.contour_finder import ContourFinder
-    from src.objs.image.detectors.corner_detector import CornerDetector
-    
-    image = cv.imread('path/to/image.jpg')
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    blurred = cv.GaussianBlur(gray, (5, 5), 0)
-    edges = cv.Canny(blurred, 50, 150)
-    contours = ContourFinder.find_contours(edges)
-    corners = CornerDetector.detect_corners(contours, image)
-    ```
     """
     @staticmethod
-    def detect_corners(contours: list, img: np.ndarray) -> list:
+    def detect_corners(contours: list, img:np.ndarray)->list:
         """This method detects the corners of a given image given the contours and returns the corners."""
 
-        # Loop through the contours and find the corners
+        # Loop over the contours.
         for c in contours:
-            # Approximate the contour
-            epsilon = 0.02 * cv.arcLength(c, True)
-            
-            # Get the corners of the contour using the approxPolyDP method
-            corners = cv.approxPolyDP(c, epsilon, True)
-
-            # If the contour has 4 corners, return the corners
-            if len(corners) == 4:
-                return sorted(np.concatenate(corners).tolist())
+                # Approximate the contour.
+                epsilon = 0.02 * cv.arcLength(c, True)
+                corners = cv.approxPolyDP(c, epsilon, True)
+                # If our approximated contour has four points
+                if len(corners) == 4:
+                        break
         
-        # If no corners are found, return an empty list
-        return []
+        # Sorting the corners and converting them to desired shape.
+        corners = sorted(np.concatenate(corners).tolist())
+
+        return CornerDetector.order_points(corners)
+    
+    @staticmethod
+    def order_points(pts: list)->list:
+        # Initialising a list of coordinates that will be ordered.
+        rect = np.zeros((4, 2), dtype='float32')
+        pts = np.array(pts)
+        s = pts.sum(axis=1)
+
+        # Top-left point will have the smallest sum.
+        rect[0] = pts[np.argmin(s)]
+
+        # Bottom-right point will have the largest sum.
+        rect[2] = pts[np.argmax(s)]
+
+        # Computing the difference between the points.
+        diff = np.diff(pts, axis=1)
+
+        # Top-right point will have the smallest difference.
+        rect[1] = pts[np.argmin(diff)]
+        
+        # Bottom-left will have the largest difference.
+        rect[3] = pts[np.argmax(diff)]
+        
+        # Return the ordered coordinates.
+        return rect.astype('int').tolist()

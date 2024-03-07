@@ -57,5 +57,5 @@ if __name__ == '__main__':
 
 """
 TODO: 
-image generation with blocks for U-NET (find out what that is)
+image generation with blocks for U-NET
 """

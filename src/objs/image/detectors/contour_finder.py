@@ -1,5 +1,4 @@
 import cv2 as cv
-import numpy as np
 
 class ContourFinder:
     """
@@ -23,18 +22,14 @@ class ContourFinder:
     ```
     """
     @staticmethod
-    def find_contours(img: np.ndarray)->list:
+    def find_contours(gpu_img: cv.cuda_GpuMat)->list:
         """ This method finds the contours in the given image and returns the top 5 contours sorted by area."""
-        # EDGE DETECTION
 
-        # GPU PROCESSING
-        gpu_img = cv.cuda.GpuMat()
-        gpu_img.upload(img)
-        gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
-        
-        # Detecting edges using Canny edge detection
+        # EDGE DETECTION
         gpu_blurred = cv.cuda.createGaussianFilter(gpu_img.type(), -1, (11, 11), 0).apply(gpu_img)
+
         detector = cv.cuda.createCannyEdgeDetector(0, 200)
+
         gpu_canny = detector.detect(gpu_blurred)
 
         canny_cpu = gpu_canny.download()  # Downloading for CPU processing
