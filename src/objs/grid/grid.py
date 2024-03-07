@@ -1,22 +1,10 @@
 import cv2 as cv
 import numpy as np
-
-from .Square import Square
+from.igrid import IGrid
+from ..Square import Square
 import itertools
-from .utils_geometry import contour_is_circular, is_arranged_as_square, find_center_of_points, find_center_of_contour, xy_to_index
-
-
-from abc import ABC, abstractmethod
-
-class IGrid(ABC):
-    @abstractmethod
-    def create_grid(self):
-        pass
-
-    @abstractmethod
-    def find_blocks(self, contours: list[np.ndarray]):
-        pass
-
+from ..utils.utils_geometry import contour_is_circular, is_arranged_as_square, find_center_of_points, find_center_of_contour, xy_to_index
+from .utils import xy_to_index 
 
 
 class Grid(IGrid):
@@ -24,6 +12,18 @@ class Grid(IGrid):
         # scanned image
         self.img = img.copy()
 
+        self.setup_rations()
+
+        # represents the grid in the image as a 2D array of squares
+        self.grid = [[None for _ in range(self.MAX_INDEX + 1)] for _ in range(self.MAX_INDEX + 1)]
+        self.blocks = []
+        self.create_grid()
+
+    def setup_rations(self):
+        """
+        ### Setup rations
+        Function that sets up the ratios used in the grid.
+        """
         # max x and y coordinates of the image
         self.MAX_XY = self.img.shape[0] # assumes image is square
 
@@ -33,18 +33,14 @@ class Grid(IGrid):
         self.SQUARE_RATIO = int(self.MAX_XY * 0.089)  # squares are the places where you can insert the ampli blocks
         self.PLUS_MINUS = int(self.MAX_XY * 0.005)    # an arbitrary general tolerance
         self.SQUARE_LENGTH = self.SQUARE_RATIO + self.EDGE_RATIO 
-
         self.MAX_INDEX = 9  # assumes grid is square 10x10 
 
-        # represents the grid in the image as a 2D array of squares
-        self.grid = [[None for _ in range(self.MAX_INDEX + 1)] for _ in range(self.MAX_INDEX + 1)]
-        self.create_grid()
 
-        # list of blocks in the grid
-        self.blocks = []
-    
-    # Creates a "map" (list of lists) of squares in the grid.
     def create_grid(self):
+        """ 
+        ### Create grid
+        Function that creates the grid of squares in the image.
+        """
         # These are the stop values for the for loops.
         STOP_XY = self.MAX_XY - self.EDGE_RATIO
         STEP = self.SQUARE_LENGTH
@@ -61,13 +57,22 @@ class Grid(IGrid):
                 # create a square object sq
                 sq = Square(
                     # top left point
-                    (x + (self.EDGE_RATIO), y + (self.EDGE_RATIO)), 
+                    (
+                        x + (self.EDGE_RATIO),
+                        y + (self.EDGE_RATIO)
+                    ), 
                     
                     # bottom right point
-                    (x + self.SQUARE_RATIO + (self.EDGE_RATIO), y + self.SQUARE_RATIO + (self.EDGE_RATIO)),
+                    (   
+                        x + self.SQUARE_RATIO + (self.EDGE_RATIO), 
+                        y + self.SQUARE_RATIO + (self.EDGE_RATIO)
+                    ),
 
                     # index of the square in the grid
-                    (x_index, y_index),
+                    (   
+                        x_index, 
+                        y_index
+                    ), 
 
                     # ratios
                     self.PIN_RATIO, 
@@ -95,8 +100,6 @@ class Grid(IGrid):
         #### Returns:
         None
         """
-
-        image_copy = self.img.copy()
 
         # finds the potential pins (p_pins) and adds them to their bounding squares.
         self.find_p_pins(contours)
@@ -161,23 +164,6 @@ class Grid(IGrid):
 
         # Square structures are 4 points (in this case potential pins) arranged in the shape of a square
         square_structures, pin_list  = self.square_structures(contours)
-
-        #"""
-        img_cp = self.img.copy()
-        for sq in square_structures:
-            top_left = (min(sq, key=lambda x: x[0])[0], min(sq, key=lambda y: y[1])[1])
-            bottom_right = (max(sq, key=lambda x: x[0])[0], max(sq, key=lambda y: y[1])[1])
-
-            cv.rectangle(img_cp, top_left, bottom_right, (255,0,0), 3)
-        
-        img_cp = cv.resize(img_cp, (500,500))
-        cv.imshow('blank', img_cp)
-
-        from random import randint
-        cv.imwrite(f"{randint(0,100)}.png", img_cp)
-        cv.waitKey(250)
-        cv.destroyAllWindows()
-        #"""
 
         # indexes around the perimeter of grid
         top_row    = [(x, 0) for x in range(self.MAX_INDEX + 1)]

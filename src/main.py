@@ -1,6 +1,5 @@
-from objs import Grid
+from objs import Grid, GridImageNormalizer, ImageLoader, ColorContourExtractor
 from backend import identify_block
-from objs import Image, ImageLoader, ImageProcessor
 
 
 def main(path_to_imgs):
@@ -25,14 +24,14 @@ def main(path_to_imgs):
         #   Create Image object from loaded image.
         # The Image object is used to store the image 
         # and the steps of the image processing.
-        image_scan, id = Image.scan(id, image, 1)
+        image_scan, id = GridImageNormalizer.scan(id, image, 1)
         if image_scan is None: continue
 
 
         #   Finds the contours around non-grayscale (colorful) 
         # edges in image. The contours are used to find the 
         # pins and later blocks.
-        contours = ImageProcessor.process_image(image_scan)
+        contours = ColorContourExtractor.process_image(image_scan)
 
 
         #   Create Grid object from the scanned image. The grid
@@ -58,4 +57,7 @@ if __name__ == '__main__':
 """
 TODO: 
 image generation with blocks for U-NET
+
+TODO:
+write on saved image the identified block types, and the sequence of the block
 """
