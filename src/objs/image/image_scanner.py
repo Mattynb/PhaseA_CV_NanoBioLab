@@ -1,86 +1,90 @@
 import cv2 as cv
 import numpy as np
 
+from .detectors.contour_finder import ContourFinder
+from .detectors.corner_detector import CornerDetector
+
+from .processors.gpu_morphological_transformer import GPUMorphologicalTransformer
+from .processors.background_remover import BackgroundRemover
+
+
 class ImageScanner:
+        """
+        Class to scan the image and return the scanned image.
+        
+        ## Methods:
+        - `scan(image_og: np.ndarray) -> np.ndarray`
+            - This method scans the image and returns the scanned image.    
+        
+        - `morphological_transform(gpu_img: cv.cuda_GpuMat) -> cv.cuda_GpuMat`
+                - This method applies morphological transformations to highlight the grid.
+        
+        - `remove_background(img: np.ndarray) -> np.ndarray`
+                - This method gets rid of the background through masking + grabcut algorithm.
+        
+        - `find_contours(gpu_img: cv.cuda_GpuMat) -> list`
+                - This method finds the contours of the image.
+        
+        - `detect_corners(contours: list, img: np.ndarray) -> list`
+                - This method detects the corners of the grid.
+        
+        - `perspective_transform(img: np.ndarray, corners: list) -> np.ndarray`
+                - This method applies perspective transform to the image.
+        
+        - `find_dest(pts: list) -> list`
+                - This method finds the destination coordinates.
+        
+        - `order_points(pts: list) -> list`
+                - This method orders the points.
+        """
+
         @classmethod
         def scan(cls, image_og: np.ndarray)->np.ndarray:
                 # copy of the image to be scanned (to not mess with the original)
                 img = image_og.copy()
 
-                # GPU acceleration for faster processing
+                # Applying morphological transformations to highlight the grid
+                # Utilizing the GPU for faster processing
                 gpu_img = cv.cuda_GpuMat()
-                gpu_img.upload(img)
-                gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
-                gpu_img = cls.morphological_transform(gpu_img)
+                gpu_img = cls.transfer_to_gpu(gpu_img, img, to_gray=True)
+                gpu_img = GPUMorphologicalTransformer.apply_morph(gpu_img)
+
+                # Isolate the grid by removing background (Only works with CPU)
+                cpu_img = cls.transfer_to_cpu(gpu_img, to_bgr=True)
+                cpu_img = BackgroundRemover.remove_background(cpu_img)
                 
-                # Only works with CPU
-                cpu_img = gpu_img.download()
-                cpu_img = cls.remove_background(cpu_img)
+                #
+                gpu_img = cls.transfer_to_gpu(gpu_img, cpu_img, to_gray=True)
+                contours = ContourFinder.find_contours(gpu_img)
+                corners = CornerDetector.detect_corners(contours, cpu_img)
                 
-                # Uploading the image to the GPU again for faster processing
-                gpu_img.upload(cpu_img)
-                contours = cls.find_contours(gpu_img)
-                corners = cls.detect_corners(contours, cpu_img)
                 final_image = cls.perspective_transform(image_og, corners)
                 
                 return final_image
         
-        @staticmethod
-        def morphological_transform(gpu_img: cv.cuda_GpuMat)->  cv.cuda_GpuMat:
-                # APPLYING MORPHOLOGICAL TRANSFORMATIONS TO HIGHLIGHT THE GRID
-                kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
-                morph = cv.cuda.createMorphologyFilter(cv.MORPH_OPEN, gpu_img.type(), kernel, iterations=3)
-                gpu_img = morph.apply(gpu_img)
-                return gpu_img
-
-        @staticmethod
-        def remove_background(img: np.ndarray)->np.ndarray:
-                # GETTING RID OF THE BACKGROUND THROUGH MASKING + GRABCUT ALGORITHM
-                mask = np.zeros(img.shape[:2],np.uint8)
-                bgdModel = np.zeros((1,65),np.float64)
-                fgdModel = np.zeros((1,65),np.float64)
-                rect = (20,20,img.shape[1]-20,img.shape[0]-20)
-                img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
-                cv.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv.GC_INIT_WITH_RECT)
-                mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
-                return img*mask2[:,:,np.newaxis]
-
-        @staticmethod
-        def find_contours(gpu_img: cv.cuda_GpuMat)->list:
-                # EDGE DETECTION
-                gpu_img = cv.cuda.cvtColor(gpu_img, cv.COLOR_BGR2GRAY)
-                gpu_blurred = cv.cuda.createGaussianFilter(gpu_img.type(), -1, (11, 11), 0).apply(gpu_img)
-                
-                detector = cv.cuda.createCannyEdgeDetector(0, 200)
-                
-                gpu_canny = detector.detect(gpu_blurred)
-
-                canny_cpu = gpu_canny.download()  # Downloading for CPU processing
-
-                # CONTOUR DETECTION (CPU)
-                contours, _ = cv.findContours(canny_cpu, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-                return sorted(contours, key=cv.contourArea, reverse=True)[:5]
-                
+        # should go to an util class
         @classmethod
-        def detect_corners(cls, contours: list, img:np.ndarray)->list:
-                # DETECTING THE CORNERS OF THE GRID
-
-                # Loop over the contours.
-                for c in contours:
-                        # Approximate the contour.
-                        epsilon = 0.02 * cv.arcLength(c, True)
-                        corners = cv.approxPolyDP(c, epsilon, True)
-                        # If our approximated contour has four points
-                        if len(corners) == 4:
-                                break
+        def transfer_to_gpu(cls, gpu_image: cv.cuda_GpuMat, image: np.ndarray = None, to_gray=False, to_bgr=False) -> cv.cuda_GpuMat:
+                if image is not None:
+                        gpu_image.upload(image)
                 
-                # Sorting the corners and converting them to desired shape.
-                corners = sorted(np.concatenate(corners).tolist())
-                corners = cls.order_points(corners)
+                if to_gray:
+                        gpu_image = cv.cuda.cvtColor(gpu_image, cv.COLOR_BGR2GRAY)
+                elif to_bgr:
+                        gpu_image = cv.cuda.cvtColor(gpu_image, cv.COLOR_GRAY2BGR)
 
-                return corners
+                return gpu_image
 
-        
+        # should go to an util class        
+        @classmethod
+        def transfer_to_cpu(cls, gpu_image: cv.cuda_GpuMat, to_gray=False, to_bgr=False) -> np.ndarray:
+                if to_gray:
+                        gpu_image = cv.cuda.cvtColor(gpu_image, cv.COLOR_BGR2GRAY)
+                elif to_bgr:
+                        gpu_image = cv.cuda.cvtColor(gpu_image, cv.COLOR_GRAY2BGR)
+                
+                return gpu_image.download()
+
         @classmethod
         def perspective_transform(cls, img: np.ndarray, corners: list)->np.ndarray:
                 # REARRANGING THE CORNERS 
@@ -119,21 +123,22 @@ class ImageScanner:
                 rect = np.zeros((4, 2), dtype='float32')
                 pts = np.array(pts)
                 s = pts.sum(axis=1)
-        
+
                 # Top-left point will have the smallest sum.
                 rect[0] = pts[np.argmin(s)]
-        
+
                 # Bottom-right point will have the largest sum.
                 rect[2] = pts[np.argmax(s)]
-        
+
                 # Computing the difference between the points.
                 diff = np.diff(pts, axis=1)
 
                 # Top-right point will have the smallest difference.
                 rect[1] = pts[np.argmin(diff)]
-                
+
                 # Bottom-left will have the largest difference.
                 rect[3] = pts[np.argmax(diff)]
-                
+
                 # Return the ordered coordinates.
                 return rect.astype('int').tolist()
+                

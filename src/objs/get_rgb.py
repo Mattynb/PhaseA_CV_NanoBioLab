@@ -1,5 +1,6 @@
 import numpy as np
 
+# should be in util class
 def get_rgb_avg_of_area(self, x, y, w, h):
         """ 
         ### Get RGB average of area
