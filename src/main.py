@@ -37,18 +37,17 @@ def main(path_to_imgs):
         #   Create Grid object from the scanned image. The grid
         # is used to store information about the grid, such as 
         # the blocks and pins, etc.
-        Grid_DS = Grid(image_scan); #Grid_DS.show_gridLines()
+        Grid_DS = Grid(image_scan)
 
 
         # determines what squares in grid are blocks
-        Grid_DS.find_blocks(contours)
-        print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
+        Grid_DS.find_blocks(contours); print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
+
 
         # identifies type of blocks in the grid
         for block in Grid_DS.blocks:
             block.get_raw_sequence()
             identify_block(block)
-
 
 if __name__ == '__main__':
     path_to_imgs =  r"data\New_images_022624\IMG_5513.JPEG"
@@ -60,4 +59,7 @@ image generation with blocks for U-NET
 
 TODO:
 write on saved image the identified block types, and the sequence of the block
+
+TODO:
+make a block class that inherits from the square class
 """

@@ -65,38 +65,53 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int, flag=0):
     # Convert tuples to lists
     points = [list(point) for point in points]
     
+    # flag is used to check recursion depth.
+    # recursion is necessary in the case 
+    # where points are in the order of (x0,y0), (x1,y1), (x3,y3), (x2,y2)
     if flag:
-        t = points[2] 
-        points[2] = points[3]
-        points[3] = t
+        points[2], points[3] = points[3], points[2]
 
-    # Assuming points is a list of four (x, y) tuples
-    # Calculate distances between each pair of points
-    dists = []
-    for i in range(3):
-        dists.append(distance(points[i], points[i + 1]))
-    dists.append(distance(points[3], points[0]))
+    # Calculate distances between each pair of points and diagonals
+    dists = calculate_distances(points)    
 
-    # corners
-    dists.append(distance(points[0], points[2]))
-    dists.append(distance(points[1], points[3]))
-
-    #dists = [distance(points[i], points[j]) for i in range(4) for j in range(i+1, 4 - i)]
-    #dists.sort()
-    """ 
+    # Check if the points form a square
+    if is_square(points, dists, SQUARE_LENGTH):
+        draw_square_on_image(points, img)
+        return True
     
-    copy =  img.copy()
-    for i in range(len(points)):
-        cv.circle(copy, points[i], 5, (0, 0, 255), -1)
-        cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
-        cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+    if not flag:
+        return is_arranged_as_square(points, img, SQUARE_LENGTH, 1)
 
-    cv.imshow("Square", copy)
-    cv.waitKey(250)
-    cv.destroyAllWindows()        
-    #"""
+    return False
 
-    if (
+def calculate_distances(points: list[tuple]) -> list[float]:
+        """
+        Calculate distances between each pair of points and diagonals.
+        ----------
+        points: list of 4 points (x,y)
+        """
+        # Assuming points is a list of four (x, y) tuples
+        # Calculate distances between each pair of points
+        dists = []
+        for i in range(3):
+            dists.append(distance(points[i], points[i + 1]))
+        dists.append(distance(points[3], points[0]))
+
+        # corners
+        dists.append(distance(points[0], points[2]))
+        dists.append(distance(points[1], points[3]))
+
+        return dists
+
+def is_square(points: list[tuple], dists: list[float], SQUARE_LENGTH: int):
+    """
+    Checks if a set of points forms a square.
+    ----------
+    points: list of 4 points (x,y)
+    dists: list of distances between each pair of points
+    SQUARE_LENGTH: expected side length of the square
+    """
+    return (
         # it is around the size of a square
         all(dist < SQUARE_LENGTH for dist in dists)
 
@@ -119,24 +134,25 @@ def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int, flag=0):
         and np.isclose(dists[0], dists[1], atol=0.1, rtol=0.1)
         and np.isclose(dists[1], dists[2], atol=0.1, rtol=0.1)
         and np.isclose(dists[2], dists[3], atol=0.1, rtol=0.1)
-    ):
-        copy =  img.copy()
-        for i in range(len(points)):
-            cv.circle(copy, points[i], 5, (0, 0, 255), -1)
-            cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
-            cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+    )
 
-        cv.imshow("Square", copy)
-        cv.waitKey(250)
-        cv.destroyAllWindows()        
-        return True
 
-        
-    if not flag:
-        return is_arranged_as_square(points, img, SQUARE_LENGTH, 1)
+def draw_square_on_image(points: list[tuple], img):
+    """
+    Draws a square on the image using the provided points.
+    ----------
+    points: list of 4 points (x,y)
+    img: the image on which to draw the square
+    """
+    copy = img.copy()
+    for i in range(len(points)):
+        cv.circle(copy, points[i], 5, (0, 0, 255), -1)
+        cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
+        cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
 
-    # Check for four sides of equal length and two equal diagonals
-    return False
+    cv.imshow("Square", copy)
+    cv.waitKey(250)
+    cv.destroyAllWindows()
 
 
 # Finds center point of contour 
