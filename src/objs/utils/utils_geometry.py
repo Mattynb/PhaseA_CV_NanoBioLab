@@ -106,10 +106,17 @@ def calculate_distances(points: list[tuple]) -> list[float]:
 def is_square(points: list[tuple], dists: list[float], SQUARE_LENGTH: int):
     """
     Checks if a set of points forms a square.
+    
     ----------
     points: list of 4 points (x,y)
     dists: list of distances between each pair of points
     SQUARE_LENGTH: expected side length of the square
+
+    Arranged as: 
+    \n
+    3---2
+
+    0---1 
     """
     return (
         # it is around the size of a square
@@ -149,10 +156,6 @@ def draw_square_on_image(points: list[tuple], img):
         cv.circle(copy, points[i], 5, (0, 0, 255), -1)
         cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
         cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
-
-    cv.imshow("Square", copy)
-    cv.waitKey(250)
-    cv.destroyAllWindows()
 
 
 # Finds center point of contour 
