@@ -220,9 +220,6 @@ class Grid(IGrid):
     ## Add functions ##
     def add_blocks(self):
         for sq in itertools.chain(*self.grid):
-            if len(sq.pins) > 0:
-                print(f"len(sq.pins) at index {sq.index}: {len(sq.pins)}")
-            
             if len(sq.pins) >= 4:
                 sq.is_block = True
                 self.blocks.append(sq)

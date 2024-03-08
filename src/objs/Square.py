@@ -2,16 +2,6 @@ from ast import Tuple
 import cv2 as cv
 from cv2.typing import MatLike
 import numpy as np
-from abc import ABC, abstractmethod
-
-class ISquare(ABC):
-    @abstractmethod
-    def is_in_corners(self, x:int, y:int)->bool:
-        pass
-
-    @abstractmethod
-    def add_pin(self, pin: np.ndarray):
-        pass
 
 class Square:
     """
@@ -75,7 +65,8 @@ class Square:
     def createImg(self, img: MatLike):
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
-       
+
+    ## Add functions ##
     def add_pin(self, pin: MatLike):
         """ Adds a pin to the square """
         self.pins.append(pin)
@@ -207,7 +198,7 @@ class Square:
             i += 1
 
 
-
+    ## RGB get functions ##
     def get_rgb_avg_of_contour(self, contour:MatLike, corner:list[MatLike]='', print_flag:int = 1):
         """
         ### Get RGB average of contour
