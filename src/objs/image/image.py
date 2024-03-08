@@ -21,7 +21,7 @@ class Image:
         """
 
         # Scan the image isolating the grid
-        Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
+        Image_i = ImageScanner.scan(image); print(f"Image {id} scanned!\n"); id += 1
 
         # Resize image so that its height and width are the same
         Image_i = cls.resize_2_std(Image_i, resize_factor)
