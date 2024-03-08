@@ -1,4 +1,4 @@
-from .Grid import Grid
+from .grid import *
 from .Square import Square
 from .image import *
 

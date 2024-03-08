@@ -2,36 +2,44 @@ import cv2 as cv
 from numpy import ndarray
 from .image_scanner import ImageScanner
 
-import time
-class Image:
+class GridImageNormalizer:
+    """
+    ### Image Normalizer
+    Class to normalize the image of the grid by scanning the grid and making it square ratio.
+
+    #### Methods:
+    - `scan(id: int, image: ndarray, resize_factor: float = 1) -> (Image, int)`
+        - This method scans the image and returns the scanned image.
+    - `resize_2_std(img: ndarray, factor: float, w:int=None, h:int = None) -> ndarray`
+        - This method resizes the image to a given percentage of the current size.
+    """
     @classmethod
     def scan(cls, id: int, image: ndarray, resize_factor : float = 1):
         """
-        ### Image maker
-        Create Image object from loaded image.
+        ### Scan image
+        Scan the image and return the scanned image.
 
         #### Args:
         * id : id of the image
-        * image : loaded image
+        * image : image to be scanned
         * resize_factor : percentage of current size to resize to
 
         #### Returns:
-        * Image object | None
-        * id
+        * scanned image
         """
 
         # Scan the image isolating the grid
         Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} loaded")
 
         # Resize image so that its height and width are the same
-        Image_i = cls.resize_2_std(Image_i, resize_factor)
+        Image_i = cls.resize(Image_i, resize_factor)
 
         return Image_i, id
 
     @staticmethod
-    def resize_2_std(img: ndarray, factor: float, w:int=None, h:int = None):
+    def resize(img: ndarray, factor: float, w:int=None, h:int = None):
         """
-        ### Resize image
+        ### Resize
         Resize image to a given percentage of current size.
 
         #### Args:

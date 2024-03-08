@@ -32,7 +32,6 @@ class Square:
     * pin_count: number of pins in the square
 
     #### Methods:
-    * add_p_pin: adds a potential pin to the square
     * add_pin: adds a pin to the square
     * draw_pins: draws the pins in the square
     * draw_corners: draws the corners of the square
@@ -44,13 +43,11 @@ class Square:
     * get_pins_rgb: gets the average RGB of the pins in the square
 
     """
-    def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img = None):
-        #self.id = id
-        
-        # potential pins        
+    def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img: np.ndarray = None):
+        # potential pins
         self.p_pins = []
-        
-        # actual pins
+
+        # pins
         self.pins = []
 
         # block or not and type of block
@@ -62,45 +59,26 @@ class Square:
         self.tl = tl; self.br = br
         self.index = index
 
-        # corners of the square
-        self.corners = self.add_corners(PIN_RATIO, PLUS_MINUS)
-
         # image and image of the square 
-        self.img = img.copy() if img is not None else None
-        #self.img_of_sq = self.createImg(img.copy()) # a cutout of the square from the image
+        self.img = img.copy()
+        self.sq_img = self.createImg(img.copy()) if img is not None else None
 
-        # rations
+        # corners of the square
+        self.corners = []
+        self.add_corners(PIN_RATIO, PLUS_MINUS)
+        
+        # ratios
         self.PIN_RATIO = PIN_RATIO
         self.PLUS_MINUS = PLUS_MINUS
 
 
-    def add_p_pin(self, p_pin: MatLike):
-        """ Adds a potential pin to the square """
-        self.p_pins.append(p_pin)
+    def createImg(self, img: MatLike):
+        """ Creates an image of the square, a cutout of the image around the square"""
+        return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
        
     def add_pin(self, pin: MatLike):
         """ Adds a pin to the square """
         self.pins.append(pin)
-        
-    def draw_pins(self, image: MatLike):
-        """ Draws the pins in the square """
-        for pin in self.pins:
-            cv.drawContours(image, pin, -1, (0, 255, 0), 1)      
-    
-    def draw_contours(self, image: MatLike, contours: list[MatLike]):
-        """"""
-        for contour in contours:
-            cv.drawContours(image, contour, -1, (155,0,0))
-        ...
-
-    def draw_corners(self, img: MatLike):
-        """ Draws the corners of the square """
-        for corner in self.corners:
-            cv.rectangle(img, corner[0], corner[1], (0, 0, 255), 1)
-
-    def createImg(self, img: MatLike):
-        """ Creates an image of the square, a cutout of the image around the square"""
-        return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
     def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8):
         """ 
@@ -137,58 +115,49 @@ class Square:
         # Each corner contains its top left and bottom right coordinates.
         # Coordinates are calculated using:
         # top left and bottom right coordinates of the square, arbitrary plus minus value, the padding value and the skew value.
-             
-        """
-        TODO: consider the case where one of the corners points is outside the image.
-        """
+       
+        self.corners = self.calculate_corners(tl_x, tl_y, br_x, br_y, PIN_RATIO, PLUS_MINUS, p, SKEW_x, SKEW_y)
 
 
+    def calculate_corners(self, tl_x:int, tl_y:int, br_x:int, br_y:int, PIN_RATIO:int, PLUS_MINUS:int, p:int, SKEW_x:int, SKEW_y:int):
+        """
+        Calculates the corners of the square using magic.
+        """
         top_right = (
-            (
-                tl_x - (p*PLUS_MINUS) + SKEW_x, 
-                tl_y - (p*PLUS_MINUS) + SKEW_y
-            ),
-            (
-                tl_x + PIN_RATIO + (p*PLUS_MINUS) + SKEW_x, 
-                tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y
-            )
+            ( tl_x - (p*PLUS_MINUS) + SKEW_x, tl_y - (p*PLUS_MINUS) + SKEW_y),
+            ( tl_x + PIN_RATIO + (p*PLUS_MINUS) + SKEW_x, tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y)
         )
 
         top_left = (
-            (
-                br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x,
-                tl_y - (p*PLUS_MINUS) + SKEW_y
-            ),
-            (
-                br_x + (p*PLUS_MINUS) + SKEW_x,
-                tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y
-            )
+            ( br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x, tl_y - (p*PLUS_MINUS) + SKEW_y),
+            ( br_x + (p*PLUS_MINUS) + SKEW_x, tl_y + PIN_RATIO + (p*PLUS_MINUS) + SKEW_y)
         )
 
         bottom_right = (
-            (
-                tl_x - (p*PLUS_MINUS) + SKEW_x, 
-                br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y
-            ),
-            (
-                tl_x + PIN_RATIO+(p*PLUS_MINUS) + SKEW_x, 
-                br_y + (p*PLUS_MINUS) + SKEW_y
-            )
+            ( tl_x - (p*PLUS_MINUS) + SKEW_x, br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y),
+            ( tl_x + PIN_RATIO+(p*PLUS_MINUS) + SKEW_x, br_y + (p*PLUS_MINUS) + SKEW_y)
         )
 
         bottom_left = (
-            (
-                br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x,
-                br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y
-            ),
-            (
-                br_x + (p*PLUS_MINUS) + SKEW_x, 
-                br_y + (p*PLUS_MINUS) + SKEW_y
-            )
+            ( br_x - PIN_RATIO - (p*PLUS_MINUS) + SKEW_x, br_y - PIN_RATIO - (p*PLUS_MINUS) + SKEW_y),
+            ( br_x + (p*PLUS_MINUS) + SKEW_x, br_y + (p*PLUS_MINUS) + SKEW_y)
         )
+        return [top_right, top_left, bottom_right, bottom_left]
+    
 
-        return [top_left, top_right, bottom_left, bottom_right]
+    ## Drawing functions ##
+    def draw_pins(self, image: MatLike):
+        """ Draws the pins in the square """
+        for pin in self.pins:
+            cv.drawContours(image, pin, -1, (0, 255, 0), 1)      
+    
+    def draw_corners(self, img: MatLike):
+        """ Draws the corners of the square """
+        for corner in self.corners:
+            cv.rectangle(img, corner[0], corner[1], (0, 0, 255), 1)
 
+
+    ### Boolean functions ###
     def is_in_corners(self, x:int, y:int):
         """ 
         Checks if a point is in the corners of the square. 
@@ -205,10 +174,17 @@ class Square:
 
         return False
     
+    def is_in_corners_skewed(self, x:int, y:int, w:float, h:float):
+        """ Checks if a point is in the corners of the square, 
+        taking into consideration the skewing that happens."""
+        return (self.is_in_corners(x, y) or
+            self.is_in_corners(x+int(w), y+int(h)) or
+            self.is_in_corners(x-int(w), y-int(h)) or
+            self.is_in_corners(x+int(w), y-int(h)) or
+            self.is_in_corners(x-int(w), y+int(h)))
+
     def which_corner_is_contour_in(self, contour:MatLike):
         """
-        ### Which corner is contour in
-        ---------------
         Function that finds which corner of square a contour is in.
         """
         corn = ["top_left", "top_right", "bottom_left", "bottom_right" ]
@@ -221,9 +197,6 @@ class Square:
                 if y >= corner[0][1] and y <= corner[1][1]:
                     return corn[i]
             i += 1
-
-        #print(f"Contour not in any corner: {x,y}")
-
 
         # might be unecessary after corner skewing
         i =0
@@ -271,17 +244,7 @@ class Square:
         # Remove NaN values
         average_rgb = np.nan_to_num(average_rgb)
 
-        # show mask
-        """
-        image = cv.bitwise_and(image, image, mask=mask)
-        cv.imshow('mask', image)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-        print(corner, average_rgb)#"""
-
         return [round(x) for x in average_rgb ]
-
-
 
     def get_pins_rgb(self, pf=1):
         """ 
