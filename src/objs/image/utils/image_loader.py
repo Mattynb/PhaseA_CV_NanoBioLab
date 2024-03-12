@@ -55,10 +55,10 @@ class ImageLoader:
         return imgs
 
     @ staticmethod
-    def heic2jpg(path_to_heic: str):
+    def heic2png(path_to_heic: str):
         """
-        ### HEIC to JPG converte
-        Creates .jpg images from the .HEIC images of given folder.    
+        ### HEIC to PNG converte
+        Creates .png images from the .HEIC images of given folder.    
         
         #### Args:
         path_to_heic: path to image folder
@@ -68,7 +68,7 @@ class ImageLoader:
         """
         
         # finding all .HEIC images in the given folder 
-        # and converting them to .jpg
+        # and converting them to .png
         paths = glob(f"{path_to_heic}.HEIC")
         for path in paths:
             pillow_heif.register_heif_opener()

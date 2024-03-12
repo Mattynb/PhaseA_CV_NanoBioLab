@@ -30,10 +30,11 @@ class GridImageNormalizer:
         print(f"Image {id} loaded")
 
         # Scan the image isolating the grid
-        Image_i = ImageScanner.scan(image); id += 1; print(f"Image {id} scanned!\n")
+        Image_i = ImageScanner.scan(image); print(f"Image {id} scanned!\n"); id += 1 
 
         # Resize image so that its height and width are the same
-        Image_i = cls.resize(Image_i, resize_factor)
+        w, h = Image_i.shape[:2]
+        Image_i = cls.resize(Image_i, 1, w, w)
 
         return Image_i, id
 

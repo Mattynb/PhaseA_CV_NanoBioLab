@@ -10,10 +10,16 @@ class CornerDetector:
     ### Methods
     - `detect_corners(contours: list, img: np.ndarray) -> list`
         - This method detects the corners of a given image given the contours and returns the corners.
+
+    ## References
+    https://learnopencv.com/automatic-document-scanner-using-opencv/
     """
     @staticmethod
     def detect_corners(contours: list, img:np.ndarray)->list:
-        """This method detects the corners of a given image given the contours and returns the corners."""
+        """
+        This method detects the corners of a given image given the contours and returns the corners.
+        Currently being used for the grid detection.
+        """
 
         # Loop over the contours.
         for c in contours:

@@ -20,6 +20,9 @@ class ContourFinder:
     edged = cv.Canny(blurred, 50, 150)
     contours = ContourFinder.find_contours(edged)
     ```
+    
+    ## reference
+    https://learnopencv.com/automatic-document-scanner-using-opencv/
     """
     @staticmethod
     def find_contours(gpu_img: cv.cuda_GpuMat)->list:

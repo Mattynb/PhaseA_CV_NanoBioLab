@@ -259,10 +259,10 @@ class Square:
         """
         ### Get raw sequence
         ---------------
-        Function that gets the raw sequence of the square.
+        Function that gets the rgb sequence of the square.
         
         #### Returns:
-        * raw_sequence: Raw sequence of the square.
+        * raw_sequence: rgb sequence of the square.
         """
       
 

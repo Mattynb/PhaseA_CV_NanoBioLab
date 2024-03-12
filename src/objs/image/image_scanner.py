@@ -39,9 +39,7 @@ class ImageScanner:
         """
 
         @classmethod
-        def scan(cls, image_og: np.ndarray)->np.ndarray:
-                # copy of the image to be scanned (to not mess with the original)
-                img = image_og.copy()
+        def scan(cls, img: np.ndarray)->np.ndarray:
 
                 # Applying morphological transformations to highlight the grid
                 # Utilizing the GPU for faster processing
@@ -58,7 +56,7 @@ class ImageScanner:
                 contours = ContourFinder.find_contours(gpu_img)
                 corners = CornerDetector.detect_corners(contours, cpu_img)
                 
-                final_image = cls.perspective_transform(image_og, corners)
+                final_image = cls.perspective_transform(img, corners)
                 
                 return final_image
         
