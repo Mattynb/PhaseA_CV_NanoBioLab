@@ -1,5 +1,6 @@
 # Ampli Recognition System
 READ ME IS OUTDATED
+
 This program is designed to load and process images from a specified folder, find the grid and Ampli blocks in the image, and then read the diagnostic result for each Ampli block. It includes the following components:
 
 - `main.py`: The main script for loading and creating Image objects from a folder of images.

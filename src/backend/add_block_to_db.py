@@ -18,5 +18,3 @@ def add_block_to_db():
 
 if __name__ == "__main__":
     add_block_to_db()
-
-    
