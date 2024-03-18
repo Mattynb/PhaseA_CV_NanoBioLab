@@ -40,6 +40,7 @@ class ColorContourExtractor:
         img_hsv = cv.cvtColor(scanned_image_copy, cv.COLOR_BGR2HSV)
 
         # Define the lower and upper bounds for the color you want to isolate
+        # These values are the product of trial and error and are not necessarily perfect.
         hsv_lower_color = np.array([0, 55, 0])
         hsv_upper_color = np.array([180, 255, 255])
 

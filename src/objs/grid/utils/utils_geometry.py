@@ -12,6 +12,7 @@ def distance(p1:float, p2:float):
     """
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
+# Not being used as of 03/18/2024
 def contour_is_circular(contour: MatLike):
     """
     ### Contour is circular

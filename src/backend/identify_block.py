@@ -1,6 +1,7 @@
 from .connect_to_db import connect_to_mongo
 
 def identify_block(block):
+    """ Function to identify the block type of a block given the RGB sequence."""
 
     # Open connection to MongoDB
     client = connect_to_mongo()
@@ -9,17 +10,20 @@ def identify_block(block):
     db = client.ampli_cv
     collection = db.color_ranges
     
-    
     # Get the RGB sequence of the 
     # block in rgb and numerical form
     sequence_rgb = []
     sequence_numerical = []
-    for rgb in block.raw_sequence:
+    for rgb in block.get_rgb_sequence():
+        # Add the RGB to the sequence_rgb list 
         sequence_rgb.append(rgb)
 
+        # Convert the RGB to a number and 
+        # add the number to the sequence_numerical list
         number = rgb_to_number(rgb, collection)
         sequence_numerical.append(number)
 
+    # Print the sequences
     print(f'RGB sequence: {sequence_rgb}')
     print(f'Numerical sequence: {sequence_numerical}')
     
@@ -55,19 +59,28 @@ def rgb_to_number(rgb, collection):
     r, g, b = rgb
     
     query = {
-        'min.0': {'$lte': r},  # Compare Red range
-        'max.0': {'$gte': r},  
-        'min.1': {'$lte': g},  # Compare Green range
-        'max.1': {'$gte': g},  
-        'min.2': {'$lte': b},  # Compare Blue range
-        'max.2': {'$gte': b}, 
+        # Compare Red range
+        'min.0': {'$lte': r},
+        'max.0': {'$gte': r},
+
+        # Compare Green range
+        'min.1': {'$lte': g},
+        'max.1': {'$gte': g},
+
+        # Compare Blue range
+        'min.2': {'$lte': b},
+        'max.2': {'$gte': b},
     }
 
+    # Find the color number
     numbers = collection.find(query)
 
+    # If there is only one color, return the color number
     for number in numbers:
         return number['color#']
     
+    # If there are multiple colors, print the colors and return the first color
+    # Note that there should not be multiple colors for a single RGB value
     print(f"Multiple colors found for r: {r}, g: {g}, b: {b}\n")
     for number in numbers:
         print(number['color#'])

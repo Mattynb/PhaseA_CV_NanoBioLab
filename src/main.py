@@ -23,11 +23,7 @@ def main(path_to_imgs):
     for image in images:
 
         ## display
-        im = image.copy()
-        im = cv.resize(im, (0,0), fx=0.5, fy=0.5)
-        cv.imshow('image', im)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        #display(image.copy())
 
         #   Create Image object from loaded image.
         # The Image object is used to store the image 
@@ -35,12 +31,14 @@ def main(path_to_imgs):
         image_scan, id = GridImageNormalizer.scan(id, image, 1)
         if image_scan is None: continue
 
+        # When working with repeat image, uncomment the line below 
+        # and comment the lines above
+        #cv.imwrite(f"image{id}_scaned.jpg", image_scan)
+        #image_scan = image
+        
         ## display
-        im = cv.resize(image_scan, (0,0), fx=0.5, fy=0.5)
-        cv.imshow('image', im)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
+        display(image_scan)
+        
         #   Finds the contours around non-grayscale (colorful) 
         # edges in image. The contours are used to find the 
         # pins and later blocks.
@@ -48,11 +46,9 @@ def main(path_to_imgs):
 
         ## display
         im = image_scan.copy()
-        for contour in contours:
-            cv.drawContours(im, [contour], 0, (0,255,0), 3)
-        cv.imshow('image', im)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        #for contour in contours:
+        #    cv.drawContours(im, [contour], 0, (0,255,0), 3)
+        #display(im)
 
         #   Create Grid object from the scanned image. The grid
         # is used to store information about the grid, such as 
@@ -61,38 +57,38 @@ def main(path_to_imgs):
 
         ## display
         im = Grid_DS.img.copy()
-        Grid_DS.draw_gridLines(im)
-        cv.imshow('image', im)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
+        #Grid_DS.draw_gridLines(im)
+        #display(im)
 
         # determines what squares in grid are blocks
         Grid_DS.find_blocks(contours); print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
 
         ## display
-        im = Grid_DS.img.copy()
-        Grid_DS.draw_blocks(im)
-        cv.imshow('image', im)
-        cv.waitKey(0)
-
-
+        #im = Grid_DS.img.copy()
+        #Grid_DS.draw_blocks(im)
+        #cv.imshow('image', im)
+        #cv.waitKey(0)
 
         # identifies type of blocks in the grid
         for block in Grid_DS.blocks:
-            block.get_raw_sequence()
+            block.set_rgb_sequence()
             identify_block(block)
 
+def display(image):
+    im = cv.resize(image, (0,0), fx=0.5, fy=0.5)
+    cv.imshow('image', im)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
 if __name__ == '__main__':
-    path_to_imgs =  r"data\New_images_022624\IMG_5513.JPEG"
+    #path_to_imgs =  r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\image1_scaned.jpg" 
+    path_to_imgs = r"C:\Users\Matheus\Desktop\NanoTechnologies_Lab\Phase A\data\New_images_03062024\IMG_5572.JPEG"
     main(path_to_imgs)
 
 
 
-"""
-TODO:
-change raw_sequence to rgb_sequence
 
+"""
 TODO:
 add reference to scan
 

@@ -2,6 +2,10 @@ import cv2 as cv
 import numpy as np
 
 class GPUMorphologicalTransformer():
+    """
+    ## reference
+    https://learnopencv.com/automatic-document-scanner-using-opencv/
+    """
     @staticmethod
     def apply_morph(gpu_img: np.ndarray) -> np.ndarray:
         """This method applies morphological transformations to the given image and returns the processed image."""
