@@ -288,14 +288,24 @@ class Square:
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
 
+<<<<<<< HEAD:src/objs/grid/Square.py
     def set_rgb_sequence(self)->None:
         """
         ### Set rgb sequence
+=======
+    def get_rgb_sequence(self):
+        """
+        ### Get rgb sequence
+>>>>>>> bb86535fe5dd720b97e5c9ff55dff83778ecc486:src/objs/Square.py
         ---------------
         Function that sets the rgb sequence of the square.
         
         #### Returns:
+<<<<<<< HEAD:src/objs/grid/Square.py
         * None
+=======
+        * rgb_sequence: rgb sequence of the square.
+>>>>>>> bb86535fe5dd720b97e5c9ff55dff83778ecc486:src/objs/Square.py
         """
       
 
