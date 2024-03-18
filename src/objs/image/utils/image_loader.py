@@ -46,7 +46,7 @@ class ImageLoader:
         end = path_to_imgs[-4:]
         if end in types or end.lower() == 'jpeg': 
             return [cv.imread(path_to_imgs)]
-
+        
         # reading all images of acceptable types from given directory 
         imgs = []
         for f_type in types: 
@@ -54,7 +54,7 @@ class ImageLoader:
         
         return imgs
 
-    @ staticmethod
+    @staticmethod
     def heic2png(path_to_heic: str):
         """
         ### HEIC to PNG converte

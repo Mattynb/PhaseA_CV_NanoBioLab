@@ -43,7 +43,7 @@ class Square:
         # block or not and type of block
         self.is_block = False
         self.block_type = ''
-        self.raw_sequence = [] #RBG values of the pins in the square (tl, tr, bl, br)
+        self.rgb_sequence = [] #RBG values of the pins in the square (tl, tr, bl, br)
 
         # coordinates and index in Grid
         self.tl = tl; self.br = br
@@ -255,14 +255,14 @@ class Square:
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
 
-    def get_raw_sequence(self):
+    def get_rgb_sequence(self):
         """
-        ### Get raw sequence
+        ### Get rgb sequence
         ---------------
         Function that gets the rgb sequence of the square.
         
         #### Returns:
-        * raw_sequence: rgb sequence of the square.
+        * rgb_sequence: rgb sequence of the square.
         """
       
 
@@ -273,7 +273,7 @@ class Square:
         # fixing the order from tr,tl,br,bl to clockwise starting from top-right. This might be the ugliest code I've ever written. But it works!
         sequence = []
 
-        for key in ["top_left", "top_right", "bottom_left", "bottom_right"]:
+        for key in ["top_left", "top_right", "bottom_right", "bottom_left"]:
             try: 
                 sequence.append(pins_rgb[corner_key.index(key)]) 
             except ValueError:
@@ -281,4 +281,4 @@ class Square:
                 sequence.append((0,0,0))
 
 
-        self.raw_sequence = sequence
+        self.rgb_sequence = sequence
