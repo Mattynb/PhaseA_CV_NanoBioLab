@@ -1,6 +1,3 @@
-from .add_block import *
-from .add_color_range import *
+from .connect_to_db import connect_to_mongo
 
-
-"""Functions to add to the database block and color_range colections."""
-__all__ = ['add_block', 'add_color_range']
+__all__ = ['connect_to_mongo']

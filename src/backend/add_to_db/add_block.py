@@ -1,4 +1,4 @@
-from ..connect_to_db import connect_to_mongo
+from connect_to_db import connect_to_mongo
 
 # This function adds a block to the database whenever theres a new block type
 def add_block():

@@ -1,4 +1,4 @@
-from .connect_to_db import connect_to_mongo
+from .add_to_db.connect_to_db import connect_to_mongo
 
 def identify_block(block):
     """ Function to identify the block type of a block given the RGB sequence."""
