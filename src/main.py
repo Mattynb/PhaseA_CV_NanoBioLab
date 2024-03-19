@@ -87,13 +87,6 @@ if __name__ == '__main__':
 
 
 
-<<<<<<< HEAD
-=======
-
-"""
-TODO:
-change raw_sequence to rgb_sequence
->>>>>>> bb86535fe5dd720b97e5c9ff55dff83778ecc486
 
 """
 TODO:

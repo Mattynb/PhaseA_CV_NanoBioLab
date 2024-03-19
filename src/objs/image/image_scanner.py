@@ -36,6 +36,9 @@ class ImageScanner:
         
         - `order_points(pts: list) -> list`
                 - This method orders the points.
+        
+        ## reference
+            https://learnopencv.com/automatic-document-scanner-using-opencv/
         """
 
         @classmethod

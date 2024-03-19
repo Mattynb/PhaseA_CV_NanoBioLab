@@ -145,7 +145,7 @@ class Square:
 
     def calculate_corners(self, tl_x:int, tl_y:int, br_x:int, br_y:int, PIN_RATIO:int, PLUS_MINUS:int, p:int, SKEW_x:int, SKEW_y:int):
         """
-        Calculates the corners of the square using magic.
+        Calculates the corners of the square using magic. The "corners" here refer to the space in the ampli block where the pins are located.
         """
         top_right = (
             ( tl_x - (p*PLUS_MINUS) + SKEW_x, tl_y - (p*PLUS_MINUS) + SKEW_y),
@@ -288,30 +288,18 @@ class Square:
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
 
-<<<<<<< HEAD:src/objs/grid/Square.py
     def set_rgb_sequence(self)->None:
         """
         ### Set rgb sequence
-=======
-    def get_rgb_sequence(self):
-        """
-        ### Get rgb sequence
->>>>>>> bb86535fe5dd720b97e5c9ff55dff83778ecc486:src/objs/Square.py
         ---------------
         Function that sets the rgb sequence of the square.
         
         #### Returns:
-<<<<<<< HEAD:src/objs/grid/Square.py
         * None
-=======
-        * rgb_sequence: rgb sequence of the square.
->>>>>>> bb86535fe5dd720b97e5c9ff55dff83778ecc486:src/objs/Square.py
         """
-      
 
         # get the RGB values of the pins in the square
         pins_rgb, corner_key = self.get_pins_rgb(0)
-
         
         # fixing the order from tr,tl,br,bl to clockwise starting from top-right. This might be the ugliest code I've ever written. But it works!
         sequence = []
@@ -322,6 +310,5 @@ class Square:
             except ValueError:
                 print(f"Key {key} not found in {corner_key}")
                 sequence.append((0,0,0))
-
 
         self.rgb_sequence = sequence

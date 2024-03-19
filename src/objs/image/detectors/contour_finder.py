@@ -3,11 +3,11 @@ import cv2 as cv
 class ContourFinder:
     """
     ## ContourFinder
-    This class is responsible for finding contours in an image.
+    This class is responsible for finding contours of the grid in an image.
 
     ### Methods
     - `find_contours(image: np.ndarray) -> list`
-        - This method finds the contours in the given image and returns the top 5 contours sorted by area.
+        - This method finds the contours of the grid in the given image and returns the top 5 contours sorted by area.
 
     ### Example
     ```python
@@ -26,7 +26,7 @@ class ContourFinder:
     """
     @staticmethod
     def find_contours(gpu_img: cv.cuda_GpuMat)->list:
-        """ This method finds the contours in the given image and returns the top 5 contours sorted by area."""
+        """ This method finds the contours of the Grid in the given image and returns the top 5 contours sorted by area."""
 
         # EDGE DETECTION
         gpu_blurred = cv.cuda.createGaussianFilter(gpu_img.type(), -1, (11, 11), 0).apply(gpu_img)

@@ -1,22 +1,13 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Original color ranges
-"""
-original_ranges = {
-    "Red": {"min": (122, 13, 34), "max": (208, 145, 160)},
-    "Blue": {"min": (7, 19, 139s), "max": (147, 148, 242)},
-    "Green": {"min": (80, 117, 54), "max": (163, 181, 156)},
-    "Purple": {"min": (83, 36, 143), "max": (148, 122, 206)}
-}
-"""
+
 # Adjusted color ranges
 adjusted_ranges = {
     "Red": {"min": (150,0,0), "max": (255,150,87+40)},
-    "Blue": {"min": (49-40,77-40,150), "max": (104,77+40+50,255)},
+    "Blue": {"min": (49-40,77-40,150), "max": (255+25,78+40+50,255)},
     "Green": {"min": (50,100,0), "max": (149,255,125)},
-    "Purple": {"min": (105,78-40,150), "max": (255+25,78+40+50,255)},
-    #"Red2": {"min" : (161,101,100), "max" : (200,125,150)},    
+    #"Purple": {"min": (105,78-40,150), "max": (255+25,78+40+50,255)},
 }
 
 def draw_cube(ax, min_corner, max_corner, color):

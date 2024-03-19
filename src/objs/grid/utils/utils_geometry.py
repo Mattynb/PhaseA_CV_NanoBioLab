@@ -12,48 +12,6 @@ def distance(p1:float, p2:float):
     """
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
-# Not being used as of 03/18/2024
-def contour_is_circular(contour: MatLike):
-    """
-    ### Contour is circular
-    ---------------
-    Function that checks if a contour is circular.
-    
-    #### Args:
-    * contour: Contour of the object in the image.
-    """
-
-    # Approximate the contour
-    perimeter = cv.arcLength(contour, True)
-    area = cv.contourArea(contour)
-    circularity = 4 * np.pi * (area / (perimeter ** 2))
-
-    # Check the circularity
-    check_1 = False
-    if 0.6 < circularity < 1.4:
-        # This contour is close to a circle
-        check_1 = True
-
-    # Fit a bounding rectangle and check the aspect ratio
-    x, y, w, h = cv.boundingRect(contour)
-    aspect_ratio = float(w) / h
-    check_2 = False
-    if 0.6 < aspect_ratio < 1.4:
-        # The contour is close to being contained in a square
-        check_2 = True
-
-    # Minimum enclosing circle
-    (x, y), radius = cv.minEnclosingCircle(contour)
-    circle_area = np.pi * (radius ** 2)
-    check_3 = False
-    if 0.6 < (area / circle_area) < 1.4:
-        # The area of the contour is close to that of the enclosing circle
-        check_3 = True
-    
-    if check_1 and check_2 and check_3:
-        return True
-
-    return False
 
 # checks if a combination of points are arranged in the shape of a square 
 def is_arranged_as_square(points:list[tuple], img, SQUARE_LENGTH:int, flag=0):
@@ -196,3 +154,45 @@ def find_center_of_points(points: list[tuple]):
 
     return (x//len(points), y//len(points))
 
+# Not being used as of 03/18/2024
+def contour_is_circular(contour: MatLike):
+    """
+    ### Contour is circular
+    ---------------
+    Function that checks if a contour is circular.
+    
+    #### Args:
+    * contour: Contour of the object in the image.
+    """
+
+    # Approximate the contour
+    perimeter = cv.arcLength(contour, True)
+    area = cv.contourArea(contour)
+    circularity = 4 * np.pi * (area / (perimeter ** 2))
+
+    # Check the circularity
+    check_1 = False
+    if 0.6 < circularity < 1.4:
+        # This contour is close to a circle
+        check_1 = True
+
+    # Fit a bounding rectangle and check the aspect ratio
+    x, y, w, h = cv.boundingRect(contour)
+    aspect_ratio = float(w) / h
+    check_2 = False
+    if 0.6 < aspect_ratio < 1.4:
+        # The contour is close to being contained in a square
+        check_2 = True
+
+    # Minimum enclosing circle
+    (x, y), radius = cv.minEnclosingCircle(contour)
+    circle_area = np.pi * (radius ** 2)
+    check_3 = False
+    if 0.6 < (area / circle_area) < 1.4:
+        # The area of the contour is close to that of the enclosing circle
+        check_3 = True
+    
+    if check_1 and check_2 and check_3:
+        return True
+
+    return False
