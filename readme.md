@@ -1,12 +1,8 @@
 # Ampli Recognition System
-READ ME IS OUTDATED
+This program is designed to load and process images from a specified folder, find the grid and Ampli blocks in the image, and then read the diagnostic result for each Ampli block. The bird's-eye view of the system is:
 
-This program is designed to load and process images from a specified folder, find the grid and Ampli blocks in the image, and then read the diagnostic result for each Ampli block. It includes the following components:
+![image](https://github.com/Mattynb/PhaseA_CV_NanoBioLab/assets/93104391/e3d7c205-2f16-4c66-a6ea-9ba37ee79a2e)
 
-- `main.py`: The main script for loading and creating Image objects from a folder of images.
-- `Image_loader.py`: A module for loading images from a folder.
-- `Image_class.py`: A module for processing and resizing images.
-- `Image_scanner.py`: A module for scanning and processing images.
 
 ## Getting Started
 
@@ -14,11 +10,18 @@ This program is designed to load and process images from a specified folder, fin
 
 Before running the code, make sure you have the following prerequisites installed:
 
-- Python 3.x
-- OpenCV (cv2)
-- Numpy (np)
-- Pillow (PIL)
-- pillow_heif
+- Python 3.12+
+- OpenCV (Cv2) 4.9.0-dev+ (with cuda for GPU acceleration)
+- Numpy 1.26.4+   
+-- ```python pip download numpy```
+- Pillow-heif 0.15.0+  
+-- ```python pip download pillow-heif```
+- Pillow (PIL) 10.2.0+  
+-- ```python pip download pillow```
+
+Good to have:
+- An IDE for coding such as Visual Studio Code
+- Git for version control
 
 ### Installation
 
@@ -39,17 +42,6 @@ if __name__ == '__main__':
     path_to_imgs = r"C:\Users\YourUser\Desktop\YourImageFolder\*"
     main(path_to_imgs)
 ```
-
-### Image Loading
-The Image_loader.py module provides functions for loading images from a folder, including HEIC to JPG conversion.
-
-### Image Processing
-The Image_class.py module includes image preprocessing and resizing functions.
-
-### Image Scanning
-The Image_scanner.py module offers functionality for scanning and processing images, including removing the background and finding grid corners.
-
-For more details, refer to the individual code files and their respective functions.
 
 ### Contributing
 If you'd like to contribute to this project, please follow these guidelines:
