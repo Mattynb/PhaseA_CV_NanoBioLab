@@ -49,7 +49,7 @@ class Square:
         self.tl = tl; self.br = br
         self.index = index
 
-        # image and image of the square 
+        # image and image of the square for visualization if necessary
         self.img = img.copy()
         self.sq_img = self.createImg(img.copy()) if img is not None else None
 
@@ -65,6 +65,10 @@ class Square:
     def get_index(self):
         """ Returns the index of the square """
         return self.index
+    
+    def get_p_pins(self):
+        """ Returns the potential pins in the square """
+        return self.p_pins
     
     def get_pins(self):
         """ Returns the pins in the square """

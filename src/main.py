@@ -56,7 +56,7 @@ def main(path_to_imgs):
         Grid_DS = Grid(image_scan)
 
         ## display
-        im = Grid_DS.img.copy()
+        #im = Grid_DS.img.copy()
         #Grid_DS.draw_gridLines(im)
         #display(im)
 
@@ -70,7 +70,7 @@ def main(path_to_imgs):
         #cv.waitKey(0)
 
         # identifies type of blocks in the grid
-        for block in Grid_DS.blocks:
+        for block in Grid_DS.get_blocks():
             block.set_rgb_sequence()
             identify_block(block)
 

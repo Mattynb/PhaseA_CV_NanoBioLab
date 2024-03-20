@@ -145,10 +145,10 @@ class Grid(IGrid):
         Adds potential pin as a pin to the square if it is.
         """
         for sq in itertools.chain(*self.grid):
-            if len(sq.p_pins) < 4:
+            if len(sq.get_p_pins()) < 4:
                 continue
 
-            for p_pin in sq.p_pins:
+            for p_pin in sq.get_p_pins():
                 x, y, w, h = cv.boundingRect(p_pin)
                 
                 # checks if top left or bottom right point of pin 
@@ -158,6 +158,9 @@ class Grid(IGrid):
 
 
     ### Get functions ###
+    def get_blocks(self):
+        return self.blocks    
+                
     def get_contour_centers(self, contours: list[np.ndarray]):
             """
             Function that finds the center point of each contour
