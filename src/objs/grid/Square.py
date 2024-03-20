@@ -33,7 +33,7 @@ class Square:
     * get_pins_rgb: gets the average RGB of the pins in the square
 
     """
-    def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img: np.ndarray = None):
+    def __init__(self, tl: int, br: int, index: Tuple, PIN_RATIO: int, PLUS_MINUS: int, img: np.ndarray = None) -> None:
         # potential pins
         self.p_pins = []
 
@@ -62,53 +62,57 @@ class Square:
         self.PLUS_MINUS = PLUS_MINUS
 
     ## Get functions ##
-    def get_index(self):
+    def get_index(self) -> Tuple:
         """ Returns the index of the square """
         return self.index
     
-    def get_p_pins(self):
+    def get_p_pins(self) -> list[int]:
         """ Returns the potential pins in the square """
         return self.p_pins
     
-    def get_pins(self):
+    def get_pins(self) -> list[int]:
         """ Returns the pins in the square """
         return self.pins
     
-    def get_corners(self):
+    def get_corners(self) -> list[int]:
         """ Returns the corners of the square """
         return self.corners
     
-    def get_img(self):
+    def get_img(self) -> MatLike:
         """ Returns the image of the square """
         return self.img
     
-    def get_sq_img(self):
+    def get_sq_img(self) -> MatLike:
         """ Returns the image of the square """
         if self.sq_img is None:
             self.sq_img = self.createImg(self.img)
         return self.sq_img
     
-    def get_block_type(self):
+    def get_block_type(self)->str:
         """ Returns the block type of the square """
         if self.is_block:
             return  self.block_type
         else:
             return "Not a block"
 
-    def get_rgb_sequence(self):
+    def get_rgb_sequence(self)->list[int]:
         """ Returns the RGB sequence of the square """
         return self.rgb_sequence
     
-    def createImg(self, img: MatLike):
+    def createImg(self, img: MatLike)->MatLike:
         """ Creates an image of the square, a cutout of the image around the square"""
         return img[(self.tl[1]-10):(self.br[1]+10), (self.tl[0]-10):(self.br[0]+10)]
 
     ## Add functions ##
-    def add_pin(self, pin: MatLike):
+    def add_pin(self, pin: MatLike)->None:
         """ Adds a pin to the square """
         self.pins.append(pin)
+    
+    def add_p_pin(self, pin: MatLike)->None:
+        """ Adds a potential pin to the square """
+        self.p_pins.append(pin)
 
-    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8):
+    def add_corners(self, PIN_RATIO: int, PLUS_MINUS:int, p:int =3, a:float = 1.8) -> None:
         """ 
         Adds the corners of the square to the square object
         
@@ -147,7 +151,7 @@ class Square:
         self.corners = self.calculate_corners(tl_x, tl_y, br_x, br_y, PIN_RATIO, PLUS_MINUS, p, SKEW_x, SKEW_y)
 
 
-    def calculate_corners(self, tl_x:int, tl_y:int, br_x:int, br_y:int, PIN_RATIO:int, PLUS_MINUS:int, p:int, SKEW_x:int, SKEW_y:int):
+    def calculate_corners(self, tl_x:int, tl_y:int, br_x:int, br_y:int, PIN_RATIO:int, PLUS_MINUS:int, p:int, SKEW_x:int, SKEW_y:int) -> list[int]:
         """
         Calculates the corners of the square using magic. The "corners" here refer to the space in the ampli block where the pins are located.
         """
@@ -174,19 +178,19 @@ class Square:
     
 
     ## Drawing functions ##
-    def draw_pins(self, image: MatLike):
+    def draw_pins(self, image: MatLike) -> None:
         """ Draws the pins in the square """
         for pin in self.pins:
             cv.drawContours(image, pin, -1, (0, 255, 0), 1)      
     
-    def draw_corners(self, img: MatLike):
+    def draw_corners(self, img: MatLike) -> None:
         """ Draws the corners of the square """
         for corner in self.corners:
             cv.rectangle(img, corner[0], corner[1], (0, 0, 255), 1)
 
 
     ### Boolean functions ###
-    def is_in_corners(self, x:int, y:int):
+    def is_in_corners(self, x:int, y:int) -> bool:
         """ 
         Checks if a point is in the corners of the square. 
         """
@@ -202,7 +206,7 @@ class Square:
 
         return False
     
-    def is_in_corners_skewed(self, x:int, y:int, w:float, h:float):
+    def is_in_corners_skewed(self, x:int, y:int, w:float, h:float) -> bool:
         """ Checks if a point is in the corners of the square, 
         taking into consideration the skewing that happens."""
         return (self.is_in_corners(x, y) or
@@ -211,7 +215,7 @@ class Square:
             self.is_in_corners(x+int(w), y-int(h)) or
             self.is_in_corners(x-int(w), y+int(h)))
 
-    def which_corner_is_contour_in(self, contour:MatLike):
+    def which_corner_is_contour_in(self, contour:MatLike) -> str:
         """
         Function that finds which corner of square a contour is in.
         """
@@ -236,7 +240,7 @@ class Square:
 
 
     ## RGB get functions ##
-    def get_rgb_avg_of_contour(self, contour:MatLike, corner:list[MatLike]='', print_flag:int = 1):
+    def get_rgb_avg_of_contour(self, contour:MatLike, corner:list[MatLike]='') -> list[int]:
         """
         ### Get RGB average of contour
         ---------------
@@ -245,8 +249,7 @@ class Square:
         #### Args:
         * contour: Contour of the object in the image.
         * corner: Corner of the square the contour is in.
-        * print_flag: Flag to print the RGB values of the contour.
-        
+
         #### Returns:
         * avg_color: Average RGB color of the contour.
         """
@@ -274,12 +277,9 @@ class Square:
 
         return [round(x) for x in average_rgb ]
 
-    def get_pins_rgb(self, pf=1):
+    def get_pins_rgb(self) -> Tuple[list[int], list[int]]:
         """ 
         gets the average RGB of the pins in the square.
-
-        #### Args:
-        * pf: print flag. Flag to print the RGB values of the pins.
         """
 
         pins_rgb = []
@@ -288,7 +288,7 @@ class Square:
         # for each pin in the square get the average RGB value of the pin and its corner
         for pins in self.pins:
             corner.append(self.which_corner_is_contour_in(pins))
-            pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner, pf))
+            pins_rgb.append(self.get_rgb_avg_of_contour(pins, corner))
 
         return pins_rgb, corner  # tr, tl, br, bl corners 
 
@@ -303,16 +303,16 @@ class Square:
         """
 
         # get the RGB values of the pins in the square
-        pins_rgb, corner_key = self.get_pins_rgb(0)
+        pins_rgb, corner_key = self.get_pins_rgb()
         
         # fixing the order from tr,tl,br,bl to clockwise starting from top-right. This might be the ugliest code I've ever written. But it works!
+        self.set_rgb_sequence_clockwise(pins_rgb, corner_key)
+    
+    def set_rgb_sequence_clockwise(self, pins_rgb: list[int], corner_key: list[int])->None:
+        """sets the rgb sequence of the square in clockwise order starting from top-left."""
+        
         sequence = []
-
         for key in ["top_left", "top_right", "bottom_right", "bottom_left"]:
-            try: 
-                sequence.append(pins_rgb[corner_key.index(key)]) 
-            except ValueError:
-                print(f"Key {key} not found in {corner_key}")
-                sequence.append((0,0,0))
-
+            sequence.append(pins_rgb[corner_key.index(key)] if key in corner_key else (0,0,0))
+        
         self.rgb_sequence = sequence

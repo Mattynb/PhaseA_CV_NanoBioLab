@@ -223,7 +223,7 @@ class Grid(IGrid):
     ## Add functions ##
     def add_blocks(self):
         for sq in itertools.chain(*self.grid):
-            if len(sq.pins) >= 4:
+            if len(sq.get_pins()) >= 4:
                 sq.is_block = True
                 self.blocks.append(sq)
     
