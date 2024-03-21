@@ -1,4 +1,4 @@
-from ast import Tuple
+from ast import List, Tuple
 import cv2 as cv
 from cv2.typing import MatLike
 import numpy as np
@@ -277,7 +277,7 @@ class Square:
 
         return [round(x) for x in average_rgb ]
 
-    def get_pins_rgb(self) -> Tuple[list[int], list[int]]:
+    def get_pins_rgb(self) -> tuple[list[int], list[int]]:
         """ 
         gets the average RGB of the pins in the square.
         """
