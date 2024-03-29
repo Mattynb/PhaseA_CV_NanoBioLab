@@ -4,7 +4,7 @@ import numpy as np
 from .detectors.contour_finder import ContourFinder
 from .detectors.corner_detector import CornerDetector
 
-from .processors.gpu_morphological_transformer import GPUMorphologicalTransformer
+from .processors.morphological_transformer import MorphologicalTransformer
 from .processors.background_remover import BackgroundRemover
 
 
@@ -43,22 +43,16 @@ class ImageScanner:
 
         @classmethod
         def scan(cls, img: np.ndarray)->np.ndarray:
-
                 # Applying morphological transformations to highlight the grid
                 # Utilizing the GPU for faster processing
-                gpu_img = cv.cuda_GpuMat()
-                gpu_img = cls.transfer_to_gpu(gpu_img, img, to_gray=True)
-                gpu_img = GPUMorphologicalTransformer.apply_morph(gpu_img)
+                morph_img = MorphologicalTransformer.apply_morph(img)
 
                 # Isolate the grid by removing background (Only works with CPU)
-                cpu_img = cls.transfer_to_cpu(gpu_img, to_bgr=True)
-                cpu_img = BackgroundRemover.remove_background(cpu_img)
+                no_bkg_img = BackgroundRemover.remove_background(morph_img)
                 
-                #
-                gpu_img = cls.transfer_to_gpu(gpu_img, cpu_img, to_gray=True)
-                contours = ContourFinder.find_contours(gpu_img)
-                corners = CornerDetector.detect_corners(contours, cpu_img)
-                
+                # Adjusting the image to highlight the grid
+                contours = ContourFinder.find_contours(no_bkg_img)
+                corners = CornerDetector.detect_corners(contours, no_bkg_img)
                 final_image = cls.perspective_transform(img, corners)
                 
                 return final_image

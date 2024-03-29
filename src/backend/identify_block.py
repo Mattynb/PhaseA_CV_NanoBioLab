@@ -5,11 +5,11 @@ def identify_block(block):
 
     # Open connection to MongoDB
     client = connect_to_mongo()
-    
+
     # Connect to the color_ranges database collection
     db = client.ampli_cv
     collection = db.color_ranges
-    
+
     # Get the RGB sequence of the 
     # block in rgb and numerical form
     sequence_rgb = []
@@ -26,7 +26,7 @@ def identify_block(block):
     # Print the sequences
     print(f'RGB sequence: {sequence_rgb}')
     print(f'Numerical sequence: {sequence_numerical}')
-    
+
 
     # Connect to the block_types collection
     block_collection = db.block_types
@@ -57,7 +57,7 @@ def rgb_to_number(rgb, collection):
     Convert an RGB value to a number using the color_ranges collection in the database.
     """
     r, g, b = rgb
-    
+
     query = {
         # Compare Red range
         'min.0': {'$lte': r},

@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 class ContourFinder:
     """
@@ -25,18 +26,13 @@ class ContourFinder:
     https://learnopencv.com/automatic-document-scanner-using-opencv/
     """
     @staticmethod
-    def find_contours(gpu_img: cv.cuda_GpuMat)->list:
+    def find_contours(image: np.ndarray) -> list:
         """ This method finds the contours of the Grid in the given image and returns the top 5 contours sorted by area."""
 
         # EDGE DETECTION
-        gpu_blurred = cv.cuda.createGaussianFilter(gpu_img.type(), -1, (11, 11), 0).apply(gpu_img)
+        blurred = cv.GaussianBlur(image, (11, 11), 0)
+        canny = cv.Canny(blurred, 0, 200)
 
-        detector = cv.cuda.createCannyEdgeDetector(0, 200)
-
-        gpu_canny = detector.detect(gpu_blurred)
-
-        canny_cpu = gpu_canny.download()  # Downloading for CPU processing
-
-        # CONTOUR DETECTION (CPU)
-        contours, _ = cv.findContours(canny_cpu, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        # CONTOUR DETECTION
+        contours, _ = cv.findContours(canny, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         return sorted(contours, key=cv.contourArea, reverse=True)[:5]

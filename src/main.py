@@ -1,3 +1,4 @@
+from tracemalloc import start
 from objs import Grid, GridImageNormalizer, ImageLoader, ColorContourExtractor
 from backend import identify_block
 
@@ -46,9 +47,9 @@ def main(path_to_imgs):
 
         ## display
         im = image_scan.copy()
-        #for contour in contours:
-        #    cv.drawContours(im, [contour], 0, (0,255,0), 3)
-        #display(im)
+        for contour in contours:
+            cv.drawContours(im, [contour], 0, (0,255,0), 3)
+        display(im)
 
         #   Create Grid object from the scanned image. The grid
         # is used to store information about the grid, such as 
@@ -64,10 +65,10 @@ def main(path_to_imgs):
         Grid_DS.find_blocks(contours); print(f"there are {len(Grid_DS.blocks)} blocks in the grid")
 
         ## display
-        #im = Grid_DS.img.copy()
-        #Grid_DS.draw_blocks(im)
-        #cv.imshow('image', im)
-        #cv.waitKey(0)
+        im = Grid_DS.img.copy()
+        Grid_DS.draw_blocks(im)
+        cv.imshow('image', im)
+        cv.waitKey(0)
 
         # identifies type of blocks in the grid
         for block in Grid_DS.get_blocks():

@@ -1,9 +1,9 @@
 from .background_remover import BackgroundRemover
-from .gpu_morphological_transformer import GPUMorphologicalTransformer
+from .morphological_transformer import MorphologicalTransformer
 from .image_processor import ColorContourExtractor
 
 __all__ = [
     "BackgroundRemover", 
-    "GPUMorphologicalTransformer", 
+    "MorphologicalTransformer", 
     "ColorContourExtractor", 
 ]

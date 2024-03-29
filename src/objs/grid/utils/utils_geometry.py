@@ -115,6 +115,7 @@ def draw_square_on_image(points: list[tuple], img):
         cv.circle(copy, points[i], 5, (0, 0, 255), -1)
         cv.line(copy, points[i], points[(i+1)%4], (0, 0, 255), 2)
         cv.putText(copy, f"{i}", points[i], cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+    cv.imshow('image', copy)
 
 
 # Finds center point of contour 
